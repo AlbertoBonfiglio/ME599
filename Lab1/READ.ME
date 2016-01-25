@@ -1,0 +1,43 @@
+Developed under python 3
+from the Lab1 directory:
+1)  To run circles automatically just launch ./circlemain.py from the terminal
+    or type python3 circlemain.py
+    To run it manually in idle open circlemain.py from Lab1 folder
+    and run the module hitting F5
+
+2)  To run damper
+        run ./dampermain.py
+        command line options are
+         -o 0,1,2,3
+            where 0 outputs all 3 simulation to matplotlib
+            and 1,2,3 output individual simulations
+
+         -p 0,1
+            where 0 disabled the Matplotlib output
+            and 1 enables it
+
+         -h prints out the help
+
+    Example:
+        To run the 2nd simulation WITH matplotlib and output enabled (can be viewed in Gnuplot)
+          run ./dampermain.py -o2 -p1  > test
+
+        To run the 2nd simulation WITHOUT matplotlib (can be viewed in Gnuplot)
+          run ./dampermain.py -o2 -p0  > test
+
+        To run all simulations at once with output enabled
+          run ./dampermain.py -p1 > test (can be viewed in Gnuplot)
+
+        To run all simulations at once with output disabled
+          run ./dampermain.py -p0 > test (cannot be viewed in Gnuplot)
+
+3) To run Damper in Idle:
+    Change directory to Lab 1
+    Start Idle from terminal (make sure is Idle for Python3.X)
+        e.g. /usr/bin/idle-python3.4
+    In the console type:
+        import classes.damper
+        myObj = Damper(m=1.0, k=1.0, c=1.0)
+        myObj.dampOverTime(x=1.0, x_dot=0.0, t=0.01, epoch=1000, out=False)
+    Change the parameters accordingly to get different outputs
+

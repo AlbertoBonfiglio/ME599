@@ -2,6 +2,7 @@
 
 from Lab2.classes.sensor import generate_sensor_data, print_sensor_data
 import numpy
+import Lab2.classes.utils as utils
 
 class Robot(object):
 
@@ -13,9 +14,8 @@ class Robot(object):
         return self.data
 
 
-    def printSensorData(self, filename):
-        print_sensor_data(self.data, filename)
-
+    def printSensorData(self, data, filename):
+        print_sensor_data(data, filename)
 
 
     def null_filter(self, data, width=0):
@@ -26,33 +26,44 @@ class Robot(object):
         return filtered
 
 
-    def filterData(self, data, width=1, usemedian=False):
+    def filterData(self, data, window=1, usemedian=False, usenumpy=False):
+        if (window < 1): window = 1
+
+        func = self.__getfilterFunction(usemedian, usenumpy)
         filtered = []
-
-        if usemedian == True:
-            func = numpy.median
-        else:
-            func = numpy.mean
-
-        window = (width*2) + 1
+        width = int((window-1) /2)
         lenData = len(data)-1
-        meandata = 0
+
         for n in range(lenData):
-            slice = []
             if n <= (width):  #
                 l = data[0:n+1]
                 r = data[n+1:(n+width)+1]
-                slice = l+r
+                dataslice = l+r
 
             elif n >= (lenData - width):
-                slice = data[n-width-1:lenData+1:]
+                dataslice = data[n-width-1:lenData+1:]
 
             else:
-                slice = data[n-width-1:n+width]
+                dataslice = data[n-width-1:n+width]
 
-
-            datum = func(slice)
+            datum = func(dataslice)
             filtered.append(datum)
 
         return filtered
+
+
+    def __getfilterFunction(self, usemedian=False, usenumpy=False):
+        if usenumpy == True:
+            if usemedian == True:
+                func = numpy.median
+            else:
+                func = numpy.mean
+        else:
+            if usemedian == True:
+                func = utils.median
+            else:
+                func = utils.mean
+
+        return func
+
 

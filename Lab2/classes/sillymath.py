@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 from math import pi, factorial, sqrt
+import Lab2.classes.utils as utils
 
 class SillyMath(object):
 
@@ -18,7 +19,7 @@ class SillyMath(object):
 
     def __iterateGDC(self, a, b):
         while True:
-            remainder = a%b
+            remainder = a % b
             if remainder == 0:
                 return b
             else:
@@ -29,7 +30,7 @@ class SillyMath(object):
         # Interestingly I found out this is the same implementation as
         # the gdc function in fractions.py ...
         while b:
-            a, b = b, a%b
+            a, b = b, (a % b)
 
         return a
 
@@ -56,10 +57,11 @@ class SillyMath(object):
 
 
     def __getSRNumerator(self, k=0):
-        return float(factorial(4*k) * (1103 + 26390 * k))
+        return float(utils.factorial(4*k) * (1103 + 26390 * k))
 
     def __getSRDenominator(self, k=0):
-        return float((factorial(k)**4) * (396 ** (4 * k)))
+        return float((utils.factorial(k)**4) * (396 ** (4 * k)))
+
 
 
 

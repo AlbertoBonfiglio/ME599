@@ -12,6 +12,8 @@ def apply_null_filter(data):
     return filtered
 
 
+
+
 if __name__ == '__main__':
     data = generate_sensor_data()
 

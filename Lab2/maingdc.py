@@ -2,7 +2,6 @@
 
 from Lab2.classes.sillymath import SillyMath
 from Lab2.classes.utils import getIntInput
-from fractions import gcd
 
 def main():
     silly = SillyMath()
@@ -12,7 +11,7 @@ def main():
         if (isel <0 or isel > 1):
             print('Seriously?? You chose {0}???'.format(isel))
         else:
-            break;
+            break
 
     if isel == 0:
         a = getIntInput('Please enter an integer for variable {0} \n', 'a')

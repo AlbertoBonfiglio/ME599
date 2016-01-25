@@ -6,12 +6,32 @@ class SillyMath(object):
 
 
     def gdc(self, a=0, b=0):
-        retVal = 0
-        modulus = a%b
+        if b == 0:
+            raise ValueError('Cannot divide by 0')
+        if a == 0:
+            raise ValueError('Variable ''a'' cannot be zero')
+        if a == b:
+            return b
+        else:
+            return self.__iterateGDC(a, b)
 
 
-        return retVal
+    def __iterateGDC(self, a, b):
+        while True:
+            remainder = a%b
+            if remainder == 0:
+                return b
+            else:
+                a, b = b, remainder
 
+
+    def gdc2(self, a=0, b=0):
+        # Interestingly I found out this is the same implementation as
+        # the gdc function in fractions.py ...
+        while b:
+            a, b = b, a%b
+
+        return a
 
 
     def estimate_pi(self):

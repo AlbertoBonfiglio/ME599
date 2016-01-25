@@ -2,7 +2,7 @@
 
 from Lab2.classes.sillymath import SillyMath
 from Lab2.classes.utils import getIntInput
-
+from fractions import gcd
 
 def main():
     silly = SillyMath()
@@ -17,8 +17,9 @@ def main():
     if isel == 0:
         a = getIntInput('Please enter an integer for variable {0} \n', 'a')
         b = getIntInput('Please enter an integer for variable {0} \n', 'b')
-        c = -1
+        c = silly.gdc(a, b)
         print('Methinks the GDC of {0} and {1} is {2}'.format(a,b,c))
+
     else:
         print('My best guess is {0}'.format(silly.estimate_pi()))
         print('Is it equal to pi? {0}'.format(silly.compare_pi(silly.estimate_pi())))

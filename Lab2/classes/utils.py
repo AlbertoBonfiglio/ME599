@@ -56,3 +56,15 @@ def factorial(n):
         retval, n = retval * t, t
 
     return int(retval)
+
+def percent_within_StdDev(data, stddev=0, multiplier=1):
+    meanval = mean(data)
+    leftboundary = meanval - (stddev*multiplier)
+    rightboundary = meanval + (stddev*multiplier)
+
+    counter = 0
+    for n in data:
+        if n > leftboundary and n < rightboundary:
+            counter +=1
+
+    return counter/len(data)

@@ -5,12 +5,6 @@ import Lab2.classes.utils as utils
 
 
 def main():
-    import math
-
-    print(math.factorial(22))
-    print(utils.factorial(22))
-
-
     silly = SillyMath()
 
     while True:

@@ -67,3 +67,28 @@ class Robot(object):
         return func
 
 
+    def printStatistics(self, data, label=''):
+        # You should print the number of data points, the mean measurement,
+        # standard deviation, median measurement, the maximum and minimum
+        # measurements, and what percentage of measurements are more than one
+        # standard deviations from the mean
+        tdata = sorted(data)
+        datapoints = len(data)
+        datamean = utils.mean(data)
+        datamedian = utils.median(data)
+
+        mindata, maxData = tdata[0], tdata[datapoints-1]
+
+        stdDev = numpy.std(data)
+        pctStdDev = utils.percent_within_StdDev(data, stdDev, 1) *100
+
+        print('''
+         Dataset --> {6}
+         Sensor readings: {0}
+         Mean reading: {1}
+         Median Reading: {2}
+         Minimum Reading: : {3}
+         Maximum Reading: {4}
+         Pct > than Standard Deviation: {5:.2f}%
+         '''.format(datapoints+1, datamean, datamedian, mindata, maxData, pctStdDev, label)
+        )

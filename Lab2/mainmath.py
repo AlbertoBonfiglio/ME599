@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
-from Lab2.classes.sillymath import SillyMath
-import Lab2.classes.utils as utils
+from classes.sillymath import SillyMath
+import classes.utils as utils
 
 
 def main():

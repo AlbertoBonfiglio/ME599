@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-from Lab2.classes.fermat import Fermat
+from classes.fermat import Fermat
 
 def main():
     fermat = Fermat()

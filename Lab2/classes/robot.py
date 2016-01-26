@@ -1,8 +1,8 @@
 #!/usr/bin/python3
 
-from Lab2.classes.sensor import generate_sensor_data, print_sensor_data
+from classes.sensor import generate_sensor_data, print_sensor_data
 import numpy
-import Lab2.classes.utils as utils
+import classes.utils as utils
 
 class Robot(object):
 

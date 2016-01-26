@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 from math import pi, factorial, sqrt
-import Lab2.classes.utils as utils
+import classes.utils as utils
 
 class SillyMath(object):
 
@@ -51,7 +51,7 @@ class SillyMath(object):
         return float(1 / retVal)
 
     def compare_pi(self, x=0):
-        if pi == x:
+        if abs(pi - x) == 0:
             return True
         return False
 

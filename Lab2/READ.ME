@@ -1,10 +1,17 @@
-Exercise 5.3. Fermat’s Last Theorem says that there are no positive integers a, b, and c such that
-a n + b n = c n
-for any values of n greater than 2.
-1. Write a function named check_fermat that takes four parameters— a , b , c and n —and that
-checks to see if Fermat’s theorem holds. If n is greater than 2 and it turns out to be true that
-a n + b n = c n
-the program should print, “Holy smokes, Fermat was wrong!” Otherwise the program should
-print, “No, that doesn’t work.”
-2. Write a function that prompts the user to input values for a , b , c and n , converts them to
-integers, and uses check_fermat to check whether they violate Fermat’s theorem.
+Programmed in Python3.4 Should work in python2.7 as well as I typecasted most of the floats
+
+1) to run fermat test run ./mainfermat.py and follow the prompts
+
+2) to run 6.8 (GdC) and 7.5 (Pi) run ./mainmath
+    select 0 for gdc or 1 for Pi
+    follow the prompts
+
+3) The noise inserted into the filter ia gaussian. Which means it has a probability density function
+   equal to a normal distribution (loosely taken from wikipedia)
+
+   to run the test run ./mainfilter.py -nX.XX -eXXXX where x is the gaussian noise to injects into the sensor data
+   if n and e are not passed it defaults to 0.25, and 1000
+   it should pop up a window with all the graphs
+   (the last 2 rows are to compare my median and mean function to numpy's)
+
+   The routine automatically saves the data produced in the executable directory as text files to be used with gnuplot

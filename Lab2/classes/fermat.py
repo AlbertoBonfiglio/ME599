@@ -17,8 +17,11 @@ class Fermat(object):
     def check_fermat(self, a,b,c,n):
         value = (a**n) + (b**n)
 
-        fermatCheck = (value == (c**n) and n > 2)
-        if fermatCheck:
+        allPositive = (a > 0 and b > 0 and c > 0)
+
+        fermatInvalid = (value == (c**n) and n > 2 and allPositive)
+
+        if fermatInvalid:
             print('{0} = {1} for n = {2}'.format(value, c**n, n))
             return self.INCORRECT
 

@@ -23,6 +23,7 @@ class SpringMassDamper:
         # Return the states (as [x, x_dot]) and the simulation timesteps
         return state, times
 
+
     # This function takes the current state [x, x_dot] and returns the
     # next velocity and acceleration [x_dot and x_dot_dot].  The
     # function is used by the scipy ode solver.

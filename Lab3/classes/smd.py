@@ -6,10 +6,10 @@ from numpy import arange
 
 # Simulated spring-mass-damper system, using the ode solver from scipy
 class SpringMassDamper:
-    def __init__(self, m, k, c, t=100.0, dt=0.01):
-        self.m = 10.0
-        self.k = 10.0
-        self.c = 1.0
+    def __init__(self, m=10.0, k=10.0, c=1.0, t=100.0, dt=0.01):
+        self.m = m
+        self.k = k
+        self.c = c
         self.t = t
         self.dt = dt
 

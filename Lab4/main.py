@@ -1,53 +1,10 @@
 #!/usr/bin/python3
 
 import matplotlib.pyplot as plt
-from matplotlib.pylab import figtext
-from matplotlib.ticker import FuncFormatter, MaxNLocator
-import numpy as np
-from Lab3.classes.utils import *
-from time import clock, process_time, time, perf_counter
+from Lab4.classes.utils import *
 
-
-timers = [time, clock, process_time, perf_counter]  #different timing functions
-tcaptions = ['time', 'clock', 'ptime', 'pcounter']
 listlen = [1, 10, 100, 1000, 10000,  100000, 1000000]
-
-
-def get_randomlists(listlenghts):
-    retval = []
-    for n in listlenghts:
-        retval.append(np.random.uniform(-1.0, 1.0, size=n ))
-
-    return retval
-
-
-def time_list_sort(lists, func=sorted):
-    retval=[]
-    try:
-        for n in lists:
-            retval.append(timethis(func, n))
-
-        return retval
-    except Exception as ex:
-        print(ex)
-
-
-def timethis(func, list, epochs=10):
-    retval = []
-    for timer in timers:
-        print('Processing function {0}'.format(timer))
-        tempval = 0
-        for n in range(epochs):
-            t1 = timer()
-            x = func(list)
-            tempval += (timer() - t1)
-
-        tempval = tempval/epochs
-
-        retval.append(tempval)
-
-    return retval
-
+tcaptions = ['time', 'clock', 'ptime', 'pcounter']
 
 def draw_plot(values, caption):
     try:
@@ -69,7 +26,7 @@ def draw_plot(values, caption):
             #Scatter plot
             legends = []
             for n in range(t_groups):
-                legends.append(axes[0].plot(listlen, pivots[n], color=np.random.rand(3, 1), label=tcaptions[n]))
+                legends.append(axes[0].plot(listlen, pivots[n], color=np.random.rand(3, 1), label= tcaptions[n]))
 
             axes[0].legend(shadow=True, loc='upper left', fontsize='small')
             axes[0].set_xlabel('Sample Size', fontsize='small')
@@ -92,22 +49,18 @@ def draw_plot(values, caption):
             axes[1].legend(bars, tcaptions, fontsize='small', loc='upper left', shadow=True)
             axes[1].axis('tight')
 
-
     except Exception as ex:
         print(ex)
 
 
 def main(argv):
     try:
+        lists = get_randomlists([10000])
 
-        times = time_list_sort(get_randomlists(listlen), sorted)
+        templist = bubble_sort(lists[0])
 
-        sums = time_list_sort(get_randomlists(listlen), sum)
-
-        draw_plot(times, 'Sort comparison')
-
-        draw_plot(sums, 'Sum comparison')
-        plt.show()
+        print(templist)
+        print(isSorted(templist))
 
     except Exception as ex:
         print(ex)

@@ -4,13 +4,8 @@ from math import sqrt, pi, e
 import numbers
 import sys
 from time import clock, process_time, time, perf_counter
-
-
-normal_termination = 0
-command_line_syntax_error = 2
-
-timers = [time, clock, process_time, perf_counter]  #different timing functions
-
+import numpy as np
+from copy import copy
 
 #region Various Math functions
 
@@ -75,7 +70,11 @@ def percent_within_StdDev(data, stddev=0, multiplier=1):
 
 #endregion
 
+
 #region Input Helpers
+normal_termination = 0
+command_line_syntax_error = 2
+
 def getIntInput(msg='', var=''):
     while True:
         try:
@@ -111,6 +110,91 @@ def get_intparam(arg, default=0, minVal=0, maxVal=0):
     except ValueError:
         print(errorstring.format(arg))
         sys.exit(command_line_syntax_error)
+
+    return retval
+
+#endregion
+
+
+#region Various Quick helpers
+
+def get_randomlists(listlenghts):
+    retval = []
+    for n in listlenghts:
+        retval.append(np.random.uniform(-1.0, 1.0, size=n))
+
+    return retval
+
+#endregion
+
+
+#region Sorting Helpers
+def bubble_sort(list):
+    templist = copy(list) #shallow copy
+
+    count = len(templist)
+
+    while count > 0:
+        index = 0 # keeps track of how the position of the last swap
+        for n in range(count - 1):
+            if templist[n] > templist[n+1]:
+                templist[n], templist[n+1] = templist[n+1], templist[n]
+                index = n+1
+        count = index
+
+    return templist
+
+def quick_sort(list):
+    templist = copy(list) #shallow copy
+
+    return templist
+
+def insertion_sort(list):
+    templist = copy(list) #shallow copy
+
+    return templist
+
+def merge_sort(list):
+    templist = copy(list) #shallow copy
+
+    return templist
+
+
+def isSorted(list):
+    for n in range(len(list)-1):
+        if list[n] > list[n+1]:
+            return False
+    return True
+#endregion
+
+
+#region Timers
+timers = [time, clock, process_time, perf_counter]  #different timing functions
+
+def time_list_sort(lists, func=sorted):
+    retval=[]
+    try:
+        for n in lists:
+            retval.append(timethis(func, n))
+
+        return retval
+    except Exception as ex:
+        print(ex)
+
+
+def timethis(func, list, epochs=10):
+    retval = []
+    for timer in timers:
+        print('Processing function {0}'.format(timer))
+        tempval = 0
+        for n in range(epochs):
+            t1 = timer()
+            x = func(list)
+            tempval += (timer() - t1)
+
+        tempval = tempval/epochs
+
+        retval.append(tempval)
 
     return retval
 

@@ -133,8 +133,11 @@ def get_randomlists(listlenghts, numpyarray=False):
 
 
 #region Sorting Helpers
-def bubble_sort(list):
-    templist = copy(list) #shallow copy
+def bubble_sort(data):
+    #if list is empty or only one element just return it
+    if len(data) <= 1: return data
+
+    templist = copy(data) #shallow copy
 
     count = len(templist)
     if count >= 2:
@@ -149,13 +152,37 @@ def bubble_sort(list):
     return templist
 
 
-def quick_sort(list):
-    templist = copy(list) #shallow copy
-    return templist
+def quick_sort(data, randPivot=True, useLambda=False):
+    #if list is empty or only one element just return it
+    if len(data) <= 1: return data
+
+    if randPivot:
+        #gets a random pivot point
+        pivot = np.random.choice(data, 1)
+    else:
+        #gets a pivot point about half way
+        pivot = data[len(data)/2]
+
+    # separates the array into less, equal or more than the pivot
+    # then recursively calls quicksort for each the subarrays
+    if not useLambda:
+        # This is pretty much what was shown in class but without lambdas
+        return (quick_sort([x for x in data if x < pivot], randPivot, useLambda) +
+                [x for x in data if x == pivot] +
+                quick_sort([x for x in data if x > pivot], randPivot, useLambda))
+    else:
+        # This is what was shown in class with lambdas
+        #TODO change list comprehension to lambdas using filter(lambda x: blah blah)
+        return (quick_sort([x for x in data if x < pivot], randPivot, useLambda) +
+                [x for x in data if x == pivot] +
+                quick_sort([x for x in data if x > pivot], randPivot, useLambda))
 
 
-def insertion_sort(list):
-    templist = list.tolist() # makes a copy of the list and converts it from a numpy array to a list
+def insertion_sort(data):
+    #if list is empty or only one element just return it
+    if len(data) <= 1: return data
+
+    templist = copy(data)
     insertionlist = []
     count = len(templist)
 
@@ -184,28 +211,34 @@ def insertion_sort(list):
         return templist
 
 
-def merge_sort(listdata, chunks=1):
+def merge_sort(data, chunks=1):
+    #if list is empty or only one element just return it
+    if len(data) <= 1: return data
 
+    #breaks down the array into individual lists of [chunks] size
     lists = []
-    for n in range(0, len(listdata), chunks):
-        lists.append(listdata[n:n+chunks])
+    for n in range(0, len(data), chunks):
+        lists.append(data[n:n+chunks])
 
+    #if the number of items is not even merges the last two and removes the last
+    #also ordters the last two items
     count = len(lists)
     if not isEven(count):
         if (lists[count-2] > lists[count-1]):
-            tempval =   lists[count-1] + lists[count-2]
+            tempval = lists[count-1] + lists[count-2]
         else:
-            tempval =   lists[count-2] + lists[count-1]
+            tempval = lists[count-2] + lists[count-1]
         lists[count-2] = tempval
         lists.pop(count-1)
-    count = len(lists)
 
-
+    #now loops in reverse merging and sorting two lists at a time until
+    #there is ony one left (the highlander algorithm!!)
     while len(lists) > 1:
         templist = []
-        for n in reversed(range(1, len(lists), 2 )):
+        for n in reversed(range(1, len(lists), 2)):
             arrayA = lists[n]
             arrayB = lists[n-1]
+            #TODO change merge_arrays to a lambda for readability and encapsulation
             templist.append(merge_arrays(arrayA, arrayB))
 
         lists = templist
@@ -216,6 +249,8 @@ def merge_sort(listdata, chunks=1):
 def merge_arrays(a, b):
     merged = []
     temp = a + b
+    # takes the smallest item in the temporary array, and appends it to the
+    # return array until the temp array is empty
     while len(temp) > 0:
         value = min(temp)
         merged.append(value)
@@ -225,9 +260,9 @@ def merge_arrays(a, b):
     return merged
 
 
-def isSorted(list):
-    for n in range(len(list)-1):
-        if list[n] > list[n+1]:
+def isSorted(data):
+    for n in range(len(data)-1):
+        if data[n] > data[n+1]:
             return False
     return True
 #endregion
@@ -236,25 +271,50 @@ def isSorted(list):
 #region Timers
 timers = [time, clock, process_time, perf_counter]  #different timing functions
 
-def time_list_sort(lists, func=sorted):
+def time_list_sort(lists, func=sorted, epochs=10, timers=[time, clock, process_time, perf_counter]):
     retval=[]
     try:
         for n in lists:
-            retval.append(timethis(func, n))
+            retval.append(__timethis(func, n, epochs, timers))
 
         return retval
+
     except Exception as ex:
         print(ex)
 
 
-def timethis(func, list, epochs=10):
+def time_algorithms(algorithms, data, epochs=10, timers=[time, clock, process_time, perf_counter]):
+    retval=[]
+
+    try:
+        for func in algorithms:
+            tempval = []
+            for item in data:
+                value = __timethis(func, item, epochs, timers)
+                if len(value) >1:
+                    tempval.append(value)
+                else:
+                    tempval.append(value[0])
+
+            retval.append(tempval)
+
+        return retval
+
+    except Exception as ex:
+        print(ex)
+
+
+
+
+def __timethis(func, data, epochs, timers):
+    tempdata = copy(data)
     retval = []
     for timer in timers:
-        print('Processing function {0}'.format(timer))
+        print('Processing {0} {1} {2}'.format(len(data), func, timer))
         tempval = 0
         for n in range(epochs):
             t1 = timer()
-            x = func(list)
+            x = func(tempdata)
             tempval += (timer() - t1)
 
         tempval = tempval/epochs

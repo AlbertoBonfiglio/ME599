@@ -55,12 +55,13 @@ def draw_plot(values, caption):
 
 def main(argv):
     try:
-        lists = get_randomlists([10000])
+        lists = get_randomlists([101])
 
-        templist = bubble_sort(lists[0])
+      #  bubblelist = bubble_sort(lists[0])
+      #  insertlist = insertion_sort(lists[0])
+        mergelist = merge_sort(lists[0])
 
-        print(templist)
-        print(isSorted(templist))
+        print(isSorted(mergelist))
 
     except Exception as ex:
         print(ex)

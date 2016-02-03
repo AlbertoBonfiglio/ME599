@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from matplotlib.pylab import figtext
 import numpy as np
 import sys, getopt
-from Lab3.classes.utils import *
+from classes.utils import *
 import random
 
 helpstring = '''

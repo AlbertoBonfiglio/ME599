@@ -5,7 +5,7 @@ import numbers
 import sys
 from time import clock, process_time, time, perf_counter
 import numpy as np
-from copy import copy
+from copy import copy, deepcopy
 
 #region Various Math functions
 
@@ -118,10 +118,14 @@ def get_intparam(arg, default=0, minVal=0, maxVal=0):
 
 #region Various Quick helpers
 
-def get_randomlists(listlenghts):
+def get_randomlists(listlenghts, numpyarray=False):
     retval = []
     for n in listlenghts:
-        retval.append(np.random.uniform(-1.0, 1.0, size=n))
+        value = np.random.uniform(-1.0, 1.0, size=n)
+        if numpyarray:
+            retval.append(value)
+        else:
+            retval.append(value.tolist())
 
     return retval
 
@@ -133,31 +137,92 @@ def bubble_sort(list):
     templist = copy(list) #shallow copy
 
     count = len(templist)
-
-    while count > 0:
-        index = 0 # keeps track of how the position of the last swap
-        for n in range(count - 1):
-            if templist[n] > templist[n+1]:
-                templist[n], templist[n+1] = templist[n+1], templist[n]
-                index = n+1
-        count = index
+    if count >= 2:
+        while count > 0:
+            index = 0 # keeps track of how the position of the last swap
+            for n in range(count - 1):
+                if templist[n] > templist[n+1]:
+                    templist[n], templist[n+1] = templist[n+1], templist[n]
+                    index = n+1
+            count = index
 
     return templist
+
 
 def quick_sort(list):
     templist = copy(list) #shallow copy
-
     return templist
+
 
 def insertion_sort(list):
-    templist = copy(list) #shallow copy
+    templist = list.tolist() # makes a copy of the list and converts it from a numpy array to a list
+    insertionlist = []
+    count = len(templist)
+
+    if count >= 2:
+        idx = np.random.randint(0, count)
+        value = templist[idx]
+        insertionlist.append(value)
+        templist.pop(idx)
+
+        while len(templist) > 0:
+            value = templist[0]
+            templist.pop(0)
+
+            for n in range(len(insertionlist)):
+                inserted = False
+                if value <= insertionlist[n]:
+                    insertionlist.insert(n, value)
+                    inserted = True
+                    break
+
+            if not inserted: insertionlist.append(value)
+
+        return insertionlist
+
+    else:
+        return templist
+
+
+def merge_sort(listdata, chunks=1):
+
+    lists = []
+    for n in range(0, len(listdata), chunks):
+        lists.append(listdata[n:n+chunks])
+
+    count = len(lists)
+    if not isEven(count):
+        if (lists[count-2] > lists[count-1]):
+            tempval =   lists[count-1] + lists[count-2]
+        else:
+            tempval =   lists[count-2] + lists[count-1]
+        lists[count-2] = tempval
+        lists.pop(count-1)
+    count = len(lists)
+
+
+    while len(lists) > 1:
+        templist = []
+        for n in reversed(range(1, len(lists), 2 )):
+            arrayA = lists[n]
+            arrayB = lists[n-1]
+            templist.append(merge_arrays(arrayA, arrayB))
+
+        lists = templist
 
     return templist
 
-def merge_sort(list):
-    templist = copy(list) #shallow copy
 
-    return templist
+def merge_arrays(a, b):
+    merged = []
+    temp = a + b
+    while len(temp) > 0:
+        value = min(temp)
+        merged.append(value)
+        idx = temp.index(value)
+        del temp[idx]
+
+    return merged
 
 
 def isSorted(list):

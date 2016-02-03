@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from matplotlib.pylab import figtext
 from matplotlib.ticker import FuncFormatter, MaxNLocator
 import numpy as np
-from Lab3.classes.utils import *
+from classes.utils import *
 from time import clock, process_time, time, perf_counter
 
 
@@ -100,11 +100,11 @@ def draw_plot(values, caption):
 def main(argv):
     try:
 
-        times = time_list_sort(get_randomlists(listlen), sorted)
+        #times = time_list_sort(get_randomlists(listlen), sorted)
 
         sums = time_list_sort(get_randomlists(listlen), sum)
 
-        draw_plot(times, 'Sort comparison')
+        #draw_plot(times, 'Sort comparison')
 
         draw_plot(sums, 'Sum comparison')
         plt.show()

@@ -1,4 +1,29 @@
 Written using python3
 
-1) Just type ./mainplot.py
+2, 3, 4) Just type ./mainplot.py
+    The program will display the sine in a matplotlib window as required.
+    Once the sine window is closed the program will display a matplotlib window with
+    the the 6 histograms
 
+5) Run ./gerryspringer for a plot of the spring damper system
+    parameters, if none passed, default to random generated ones.
+    parameters can be specified by passing
+    "-m", "--mass="      with values between 1, 10.0
+    "-k", "--spring="           ""           1, 3.0
+    "-c", "--damp="             ""           0.01, 1.0
+    "-t", "--time="             ""           25, 500
+    "-dt", "--delta="           ""           0.001, 0.1
+    "-x", "--pos="              ""           0, 10.0
+    "-xd", "--vel="             ""           0.1, 5.0
+
+    e.g. ./gerryspringer.py -m3 --vel=4 will simulate a system where the mass is 3 kg and the initial velocity is 5m/s
+        all other parameters will be randomly generated between the valid values
+
+
+6) run .summer.py
+    will take a while. The program generates random normally distributed lists
+    of [1, 10, 100, 1000, 10000,  100000, 1000000] items
+    then times the execution of the built in sum and sorted functions.
+    each function is run 10 times per list against 4 different timing counters (clock, process_time, time, perf_counter)
+    and each result averaged.
+    Results are plotted on matplotlib with sorting being displayed first then sum

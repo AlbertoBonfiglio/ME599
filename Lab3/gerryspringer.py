@@ -3,16 +3,23 @@
 from classes.smd import SpringMassDamper
 import matplotlib.pyplot as plt
 from matplotlib.pylab import figtext
-import numpy as np
 import sys, getopt
 from classes.utils import *
 import random
 
 helpstring = '''
-gerryspringer.py -e <option> -n <option>
+gerryspringer.py
     -h prints this help out
-    -e number of epochs (default 1000)
-    -n gaussian noise (default 0.25)
+    -m  or --mass=   mass in kilos (default between 1, 10.0)
+    -k  or --spring= spring coeff  (default between 1, 3.0)
+    -c  or --damp=   damp coeff    (default between 0.01, 1.0)
+    -t  or --time=   sim time      (default between 25, 500)
+    -dt or --delta=  time slice    (default between 0.001, 0.1)
+    -x  or --pos=    initial pos   (default between 0, 10.0)
+    -xd or --vel=    initial vel   (default between 0.1, 5.0)
+    e.g. ./gerryspringer.py -m3 --vel=4 will simulate a system
+        where the mass is 3 kg, the initial velocity is 5m/s
+        all other parameters will be randomly generated
     '''
 
 shortParams = 'hm:k:c:t:dt:x:xd:'
@@ -51,19 +58,19 @@ def get_parameters(argv, shortparams='h', longparams=[help]):
                 spring = get_floatparam(arg, spring, 1, 3.0)
 
             elif opt in ("-c", "--damp"):
-                spring = get_floatparam(arg, damp, 0.01, 1.0)
+                damp = get_floatparam(arg, damp, 0.01, 1.0)
 
             elif opt in ("-t", "--time"):
-                spring = get_intparam(arg, t, 25, 500)
+                t = get_intparam(arg, t, 25, 500)
 
             elif opt in ("-dt", "--delta"):
-                spring = get_floatparam(arg, dt, 0.001, 0.1)
+                dt = get_floatparam(arg, dt, 0.001, 0.1)
 
             elif opt in ("-x", "--pos"):
-                spring = get_floatparam(arg, dt, 0, 10.0)
+                x = get_floatparam(arg, dt, 0, 10.0)
 
             elif opt in ("-xd", "--vel"):
-                spring = get_floatparam(arg, dt, 0.1, 5.0)
+                x_dot = get_floatparam(arg, dt, 0.1, 5.0)
 
     return mass, spring, damp, t, dt, x, x_dot
 
@@ -93,7 +100,7 @@ def main(argv):
     mass, spring, damp, t, dt, x, x_dot = get_parameters(argv, shortParams, longParams)
 
     try:
-        caption = 'Initial conditions:\nM={0:.2f} Kg, K={1:.2f}, C={2:.2f}ns\m \n t={3}s, dt={4:.3f}s\n x={5:.3f}m, xdot={6:.3f}ms'.format(mass, spring, damp, t, dt, x, x_dot)
+        caption = 'Initial conditions:\nM={0:.2f} Kg, K={1:.2f}, C={2:.2f}ns/m \n t={3}s, dt={4:.3f}s\n x={5:.3f}m, xdot={6:.3f}ms'.format(mass, spring, damp, t, dt, x, x_dot)
 
         gerry = SpringMassDamper(mass, spring, damp, t, dt)
         states, times = gerry.simulate(x, x_dot)

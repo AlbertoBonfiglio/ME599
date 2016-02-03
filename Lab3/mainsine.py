@@ -39,7 +39,7 @@ def sampleHistoPlot():
     samples = [10, 100, 1000, 10000, 100000, 1000000]
 
     fig, axes = plt.subplots(nrows=2, ncols=3, sharex=False, sharey=False)
-    fig.suptitle('CLT', fontsize=20)
+    fig.suptitle('CLT plot', fontsize=20)
 
     x, y = 0, 0
     for n in range(len(samples)):

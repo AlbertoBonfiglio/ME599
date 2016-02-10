@@ -2,10 +2,10 @@
 from math import pi
 
 #TODO test code
-class circle(object):
+class Circle(object):
 
     def __init__(self, radius=1):
-        pass
+        self.radius = radius
 
     def area(self):
         return pi * (self.radius**2)

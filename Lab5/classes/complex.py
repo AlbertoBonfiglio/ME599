@@ -21,7 +21,7 @@ class Complex(object):
         if self.real < 0: rSign = '-'
         if self.imaginary < 0: iSign = '-'
 
-        retval = '({0}{1} {2} {3}i)'.format(rSign, abs(self.real), iSign, abs(self.imaginary))
+        retval = '({0}{1}{2}{3}i)'.format(rSign, abs(self.real), iSign, abs(self.imaginary))
         return retval
 
 

@@ -1,10 +1,12 @@
 #!/usr/bin/python3
 
 import matplotlib.pyplot as plt
-from Lab4.classes.utils import *
+from classes.utils import *
 
-listlen = [1, 10, 100, 1000, 2000]#,  100000, 1000000]
+listlen = [500, 1000, 2000, 3000]#,  100000, 1000000]
 tcaptions = ['time', 'clock', 'ptime', 'pcounter']
+scaptions =['sorted', 'bubble', 'insertion', 'merge', 'quick']
+
 algorithms = [sorted, bubble_sort, insertion_sort, merge_sort, quick_sort]
 
 def draw_plot(values, caption, timers=[process_time]):
@@ -33,7 +35,7 @@ def draw_plot(values, caption, timers=[process_time]):
                 bars.append(ax.bar(np.arange(n_groups) + width, algorithm, width=0.25, color=np.random.rand(3,1)))
                 width +=.25
 
-                ax.set_xlabel('Sample Size', fontsize='small')
+                ax.set_xlabel('{0} #'.format(scaptions[col]), fontsize='small')
                 ax.set_ylabel('Time (s)', fontsize='small')
                 ax.set_xticks(position + (width/t_groups) *2)
                 ax.set_xticklabels(listlen, fontsize='small')
@@ -63,10 +65,17 @@ def draw_plot(values, caption, timers=[process_time]):
 def main(argv):
     try:
         lists = get_randomlists(listlen)
+
+        for n in range(len(lists)):
+            for func in algorithms:
+                data = func(lists[n])
+
+                print('list {0} is sorted: {1} {2}'.format(n, isSorted(data), isReallySorted(data)))
+
+        getAnyInput('press any key now....')
+
+
         times = time_algorithms(algorithms, lists, timers=[process_time])
-
-
-
         #times should be a matrix of
         # algorithm 1 - list 1 timer 1-n ; list 2 timer 1-n ....
         # algorithm 2 - list 1 timer 1-n ; list 2 timer 1-n ....

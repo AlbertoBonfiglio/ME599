@@ -84,6 +84,11 @@ def getIntInput(msg='', var=''):
             print(ex)
 
 
+def getAnyInput(msg='', var=''):
+    while True:
+        retval = input(msg.format(var))
+        return retval
+
 def get_floatparam(arg, default=0.0, minVal=0.0, maxVal=0.0):
     errorstring = '{0} is not a valid option value.'
     retval = default
@@ -265,6 +270,17 @@ def isSorted(data):
         if data[n] > data[n+1]:
             return False
     return True
+
+
+def isReallySorted(data):
+    temp = copy(data)
+    temp.sort()
+    for n in range(len(data)-1):
+        if data[n] != temp[n]:
+            return False
+    return True
+
+
 #endregion
 
 

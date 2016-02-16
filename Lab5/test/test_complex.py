@@ -25,7 +25,6 @@ class TestComplex(TestCase):
 
         self.assertEquals(scomplex, sComplex)
 
-
     def test_sum_complex(self):
         _real = randint(-100, 100)
         _imaginary = randint(-100, 100)
@@ -42,7 +41,6 @@ class TestComplex(TestCase):
         vobj3 = vobj + vobj2
 
         self.assertEquals(str(obj3), self.replace_j(vobj3))
-
 
     def test_sum_to_complex(self):
         _real = randint(-100, 100)
@@ -87,19 +85,37 @@ class TestComplex(TestCase):
 
         self.assertEquals(str(obj3), self.replace_j(vobj3))
 
-#endregion
-
-
     def test_rsum_complex(self):
-        raise NotImplemented
+        _real = randint(-100, 100)
+        _imaginary = randint(-100, 100)
+        _real2 = randint(-100, 100)
 
+        obj = Complex(_real, _imaginary)
+        vobj = Complex(_real, _imaginary)
 
+        obj3 = _real2 + obj
+        vobj3 = _real2 + vobj
+
+        self.assertEquals(str(obj3), self.replace_j(vobj3))
 
     def test_rsub_complex(self):
-        raise NotImplemented
+        _real = randint(-100, 100)
+        _imaginary = randint(-100, 100)
+        _real2 = randint(-100, 100)
+
+        obj = Complex(_real, _imaginary)
+        vobj = Complex(_real, _imaginary)
+
+        obj3 = _real2 - obj
+        vobj3 = _real2 - vobj
+
+        self.assertEquals(str(obj3), self.replace_j(vobj3))
+
+#endregion
 
     def test_mult_complex(self):
         raise NotImplemented
+
 
     def test_div_complex(self):
         raise NotImplemented

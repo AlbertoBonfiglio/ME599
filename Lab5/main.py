@@ -30,6 +30,17 @@ def main(argv):
         y = complex(3, -2.3)
 
         print(x, y, x*y)
+
+
+        z = Complex(1,2)
+        print('conjugate {0}'.format(~z))
+
+
+        print('division = {0}'.format(x/y))
+
+        print('division = {0}'.format(e/d))
+
+
     except Exception as ex:
         print(ex)
 

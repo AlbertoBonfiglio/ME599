@@ -111,12 +111,65 @@ class TestComplex(TestCase):
 
         self.assertEquals(str(obj3), self.replace_j(vobj3))
 
-#endregion
+    def test_conjugate_complex(self):
+        _real = randint(-100, 100)
+        _imaginary = randint(-100, 100)
+
+        obj = Complex(_real, _imaginary)
+        vobj = Complex(_real, -_imaginary)
+
+
+        self.assertEquals(str(~obj), str(vobj))
 
     def test_mult_complex(self):
-        raise NotImplemented
+        _real = randint(-100, 100)
+        _imaginary = randint(-100, 100)
+        _real2 = randint(-100, 100)
+        _imaginary2 = randint(-100, 100)
+
+        obj = Complex(_real, _imaginary)
+        obj2 = Complex(_real2, _imaginary2)
+
+        tobj = complex(_real, _imaginary)
+        tobj2 = complex(_real2, _imaginary2)
+
+        res1 = obj * obj2
+        res2 = tobj * tobj2
+
+        self.assertEquals(str(res1), self.replace_j(res2))
 
 
     def test_div_complex(self):
-        raise NotImplemented
+        _real = randint(-100, 100)
+        _imaginary = randint(-100, 100)
+        _real2 = randint(-100, 100)
+        _imaginary2 = randint(-100, 100)
+
+        obj = Complex(_real, _imaginary)
+        obj2 = Complex(_real2, _imaginary2)
+
+        tobj = complex(_real, _imaginary)
+        tobj2 = complex(_real2, _imaginary2)
+
+        res1 = obj / obj2
+        res2 = tobj / tobj2
+
+        self.assertEquals(str(res1), self.replace_j(res2))
+
+#endregion
+
+
+
+
+
+
+
+
+    def test_root_complex(self):
+        _real = randint(-100, 100)
+        _imaginary = randint(-100, 100)
+        _real2 = randint(-100, 100)
+
+        obj = Complex(_real, _imaginary)
+        vobj = complex(_real, _imaginary)
 

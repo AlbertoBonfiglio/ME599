@@ -82,9 +82,13 @@ class Complex(object):
         else:
             raise ValueError('{0} is not a valid value'.format(other))
 
-        return Complex(_real, _imaginary)
+        return Complex(self.real*other.real - self.imaginary*other.imaginary,
+                       self.imaginary*other.real + self.real*other.imaginary)
 
 
+    def __invert__(self):
+        return Complex(self.real, -self.imaginary)
 
-        return Complex(self.real*other.real - self.imag*other.imag,
-                       self.imag*other.real + self.real*other.imag)
+
+    def __truediv__(self, other):
+        raise NotImplemented

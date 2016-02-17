@@ -11,7 +11,7 @@ class Complex(object):
         if not isinstance(imaginary, (Number)):
             raise ValueError('{0} is not a valid imaginary number'.format(imaginary))
 
-        self.real = int(real)
+        self.real = real
         self.imaginary = imaginary
 
 
@@ -22,6 +22,8 @@ class Complex(object):
         if self.imaginary < 0: iSign = '-'
 
         retval = '({0}{1}{2}{3}i)'.format(rSign, abs(self.real), iSign, abs(self.imaginary))
+        #retval = '({0}{1}{2}{3}i)'.format(rSign, self.real, iSign, abself.imaginary)
+
         return retval
 
 
@@ -77,7 +79,9 @@ class Complex(object):
             _imaginary = _imaginary * other.imaginary
 
         elif isinstance(other, Number):
-            _real = _real * int(other)
+            other = Complex(other, 0)
+            _real = _real * other.real
+            _imaginary = _imaginary * other.imaginary
 
         else:
             raise ValueError('{0} is not a valid value'.format(other))
@@ -86,9 +90,56 @@ class Complex(object):
                        self.imaginary*other.real + self.real*other.imaginary)
 
 
+    def __rmul__(self, other):
+        return self.__mul__(other)
+
+
     def __invert__(self):
         return Complex(self.real, -self.imaginary)
 
 
     def __truediv__(self, other):
-        raise NotImplemented
+        if isinstance(other, Number):
+            other = Complex(other, 0)
+
+        conj = ~other
+
+        f,o,i,l = self.foil(self, conj)
+        f1, o1, i1, l1 = self.foil(other, conj)
+
+        numr = f + l
+        numi = o + i
+
+        denr = f1 + l1
+        deni = o1 + i1
+
+        return Complex(numr/denr, numi/denr)
+
+
+    def __rtruediv__(self, other):
+        if isinstance(other, Number):
+            other = Complex(other, 0)
+
+        conj = ~self
+
+        f,o,i,l = self.foil(other, conj)
+        f1, o1, i1, l1 = self.foil(self, conj)
+
+        numr = f + l
+        numi = o + i
+
+        denr = f1 + l1
+        deni = o1 + i1
+
+        return Complex(numr/denr, numi/denr)
+
+
+    def foil(self, c1, c2):
+        f = c1.real * c2.real
+        o = c1.real * c2.imaginary
+        i = c1.imaginary * c2.real
+        l = -(c1.imaginary * c2.imaginary)
+
+        return f,o,i,l
+
+

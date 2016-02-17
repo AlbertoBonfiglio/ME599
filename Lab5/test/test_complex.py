@@ -1,6 +1,7 @@
 from unittest import TestCase
 from Lab5.classes.complex import Complex
 from random import randint
+from math import isclose
 
 class TestComplex(TestCase):
 
@@ -55,6 +56,21 @@ class TestComplex(TestCase):
 
         self.assertEquals(str(obj3), self.replace_j(vobj3))
 
+    def test_rsum_complex(self):
+        _real = randint(-100, 100)
+        _imaginary = randint(-100, 100)
+        _real2 = randint(-100, 100)
+
+        obj = Complex(_real, _imaginary)
+        vobj = Complex(_real, _imaginary)
+
+        obj3 = _real2 + obj
+        vobj3 = _real2 + vobj
+
+        self.assertEquals(str(obj3), self.replace_j(vobj3))
+
+
+
     def test_sub_complex(self):
         _real = randint(-100, 100)
         _imaginary = randint(-100, 100)
@@ -85,19 +101,6 @@ class TestComplex(TestCase):
 
         self.assertEquals(str(obj3), self.replace_j(vobj3))
 
-    def test_rsum_complex(self):
-        _real = randint(-100, 100)
-        _imaginary = randint(-100, 100)
-        _real2 = randint(-100, 100)
-
-        obj = Complex(_real, _imaginary)
-        vobj = Complex(_real, _imaginary)
-
-        obj3 = _real2 + obj
-        vobj3 = _real2 + vobj
-
-        self.assertEquals(str(obj3), self.replace_j(vobj3))
-
     def test_rsub_complex(self):
         _real = randint(-100, 100)
         _imaginary = randint(-100, 100)
@@ -121,6 +124,7 @@ class TestComplex(TestCase):
 
         self.assertEquals(str(~obj), str(vobj))
 
+
     def test_mult_complex(self):
         _real = randint(-100, 100)
         _imaginary = randint(-100, 100)
@@ -135,6 +139,32 @@ class TestComplex(TestCase):
 
         res1 = obj * obj2
         res2 = tobj * tobj2
+
+        self.assertEquals(str(res1), self.replace_j(res2))
+
+    def test_mult_to_complex(self):
+        _real = randint(-100, 100)
+        _imaginary = randint(-100, 100)
+        _real2 = randint(-100, 100)
+
+        obj = Complex(_real, _imaginary)
+        tobj = complex(_real, _imaginary)
+
+        res1 = obj * _real
+        res2 = tobj * _real
+
+        self.assertEquals(str(res1), self.replace_j(res2))
+
+    def test_rmult_complex(self):
+        _real = randint(-100, 100)
+        _imaginary = randint(-100, 100)
+        _real2 = randint(-100, 100)
+
+        obj = Complex(_real, _imaginary)
+        tobj = complex(_real, _imaginary)
+
+        res1 = _real * obj
+        res2 = _real * tobj
 
         self.assertEquals(str(res1), self.replace_j(res2))
 
@@ -154,14 +184,49 @@ class TestComplex(TestCase):
         res1 = obj / obj2
         res2 = tobj / tobj2
 
-        self.assertEquals(str(res1), self.replace_j(res2))
+
+        _iscloseR = isclose(res1.real, res2.real, rel_tol=1e-09, abs_tol=0.0)
+        _iscloseI = isclose(res1.imaginary, res2.imag, rel_tol=1e-09, abs_tol=0.0)
+
+        self.assertEquals(_iscloseR, True)
+        self.assertEquals(_iscloseI, True)
+
+    def test_div_to_complex(self):
+        _real = randint(-100, 100)
+        _imaginary = randint(-100, 100)
+        _real2 = randint(-100, 100)
+
+        obj = Complex(_real, _imaginary)
+        tobj = complex(_real, _imaginary)
+
+        res1 = obj / _real2
+        res2 = tobj / _real2
+
+
+        _iscloseR = isclose(res1.real, res2.real, rel_tol=1e-09, abs_tol=0.0)
+        _iscloseI = isclose(res1.imaginary, res2.imag, rel_tol=1e-09, abs_tol=0.0)
+
+        self.assertEquals(_iscloseR, True)
+        self.assertEquals(_iscloseI, True)
+
+    def test_rdiv_complex(self):
+        _real = randint(-100, 100)
+        _imaginary = randint(-100, 100)
+        _real2 = randint(-100, 100)
+
+        obj = Complex(_real, _imaginary)
+        tobj = complex(_real, _imaginary)
+
+        res1 = _real2 / obj
+        res2 = _real2 / tobj
+
+        _iscloseR = isclose(res1.real, res2.real, rel_tol=1e-09, abs_tol=0.0)
+        _iscloseI = isclose(res1.imaginary, res2.imag, rel_tol=1e-09, abs_tol=0.0)
+
+        self.assertEquals(_iscloseR, True)
+        self.assertEquals(_iscloseI, True)
 
 #endregion
-
-
-
-
-
 
 
 
@@ -173,3 +238,4 @@ class TestComplex(TestCase):
         obj = Complex(_real, _imaginary)
         vobj = complex(_real, _imaginary)
 
+        raise NotImplementedError('Not implemented yet')

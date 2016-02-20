@@ -1,51 +1,31 @@
 #!/usr/bin/python3
 
-from classes.utils import *
-from classes.complex import Complex
-from classes.circle import Circle
-from random import randint
+import sys
+#from Lab6.classes.utils import *
+from Lab6.classes.grabber2 import Webcamera
+import Lab6.classes.event
+
+
 def main(argv):
     try:
-        radius = randint(1,100)
-        cir = Circle(radius)
-        print('Circle Radius {0}, Diameter = {1}, Area = {2}, Circumference = {3}'.format(cir.radius, cir.diameter(), cir.area(), cir.circumference()))
+        _webcam = Webcamera()
+        _webcam.OnCapture += printevent
+        _webcam.OnCaptureComplete += printcomplete
+        _webcam.capture(30, 0.05)
 
-
-        a = Complex()
-        b = Complex(2)
-        c = Complex(1.0, 2.3)
-        d = Complex(-2.0, 2.3)
-        e = Complex(3.2, -2.3)
-
-        print('sum --> {0}, {1} = {2}'.format(c, d, c + d))
-        print('sum --> {0}, {1} = {2}'.format(c, 3, c + 3))
-        print('sum --> {0}, {1} = {2}'.format(3, c, 3 + c))
-
-        print('sub --> {0}, {1} = {2}'.format(c, d, c - d))
-        print('sub --> {0}, {1} = {2}'.format(c, 3, c - 3))
-        print('sub --> {0}, {1} = {2}'.format(3, c, 3 - c))
-
-        print('mult --> {0}, {1} = {2}'.format(c, d, c * d))
-        print('mult --> {0}, {1} = {2}'.format(c, 3, c * 3))
-        print('mult --> {0}, {1} = {2}'.format(3, c, 3 * c))
-
-
-        print('div --> {0}, {1} = {2}'.format(c, d, c / d))
-        print('div --> {0}, {1} = {2}'.format(c, 3, c / 3))
-        print('div --> {0}, {1} = {2}'.format(3, c, 3 / c))
-        print('div --> {0}, {1} = {2}'.format(3, complex(1.0, 2.3), 3 / complex(1.0, 2.3)))
-
-        print('conjugate --> {0}'.format(c))
-
-        print('Root '.format())
-
+        print(_webcam.history)
 
     except Exception as ex:
+        print('Could not save image to file')
         print(ex)
 
 
 
+def printevent(sender, args):
+    print('captured')
 
+def printcomplete(sender, args):
+    print('Captured finished')
 
 if __name__ == '__main__':
     main(sys.argv[1:])

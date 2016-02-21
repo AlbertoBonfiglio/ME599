@@ -1,17 +1,23 @@
 #!/usr/bin/python3
 
-from urllib.request import urlopen # fix for Python3
-from PIL import Image, ImageDraw
-from Lab6.classes.grabber import Webcam
 import time
 import io
 import uuid
 import Lab6.classes.event as event
+import numpy
+
+from urllib.request import urlopen # fix for Python3
+from PIL import Image, ImageDraw
+from Lab6.classes.grabber import Webcam
+from collections import Counter
 
 
 # Interface to the Oregon State University webcams.  This should work
 # with any web-enabled AXIS camera system.
 class Webcamera(Webcam):
+
+    #TODO calculate the right threshold
+    __daylightThreshold = 45
 
     def __init__(self):
         super(Webcamera, self).__init__()
@@ -30,8 +36,11 @@ class Webcamera(Webcam):
             while _running:
                 _filename = str(uuid.uuid4()) + '.jpg'
                 _image = self.save_image(_filename)
+                _intensity = self.image_average_intensity(_image)
+                _daylight = self.daytime(_intensity)
+                _mcc = self.image_most_common_colour(_image)
 
-                _image_data = WebImage(_filename, False, 0, (255, 255, 255), time.time(), delay)
+                _image_data = WebImage(_filename, _intensity, _daylight,  (255, 255, 255), time.time(), delay)
                 self.history.append(_image_data)
 
                 self.OnCapture(self, None)
@@ -63,46 +72,32 @@ class Webcamera(Webcam):
             print(ex)
 
 
-    def daytime(self):
-        retval = False
-        try:
-            raise NotImplementedError
-            return retval
-
-        except Exception as ex:
-            print(ex)
-
-
-    def image_intensity(self, image):
-        retval = 0
-        try:
-            raise NotImplementedError
-            return retval
-
-        except Exception as ex:
-            print(ex)
-
-
     def image_average_intensity(self, image):
-        retval = 0
         try:
-            raise NotImplementedError
-            return retval
+            pixels = numpy.array(image.getdata())
+            return numpy.mean(pixels)
 
         except Exception as ex:
             print(ex)
 
 
-    def image_most_common_colour(self):
-        retval = 0
+    def image_most_common_colour(self, image):
         try:
-            raise NotImplementedError
-            return retval
+            #pixels,count = numpy.unique(image.getdata(), return_counts=True)
+            pixels = image.getdata()
+            colours = Counter(pixels).most_common(1)
+            return colours
 
         except Exception as ex:
             print(ex)
 
 
+    def daytime(self, intensity=0):
+        return intensity <= self.__daylightThreshold
+
+
+
+    #TODO detect motion
     def detect_motion(self, interval=10):
         retval = 0
         try:
@@ -112,7 +107,7 @@ class Webcamera(Webcam):
         except Exception as ex:
             print(ex)
 
-
+    #TODO detect Event
     def detect_event(self):
         retval = 0
         try:
@@ -124,10 +119,11 @@ class Webcamera(Webcam):
 
 
 class WebImage(object):
-    def __init__(self, id, daytime, intensity, mcc, ctime, interval):
+    def __init__(self, id, intensity, daytime, mcc, ctime, interval):
         self.id = id
-        self.daytime = daytime
         self.intensity = intensity
+        self.daytime = daytime
+
         self.mcc = mcc
         self.time = ctime
         self.interval = interval

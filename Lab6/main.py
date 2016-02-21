@@ -11,7 +11,8 @@ def main(argv):
         _webcam = Webcamera()
         _webcam.OnCapture += printevent
         _webcam.OnCaptureComplete += printcomplete
-        _webcam.capture(30, 0.05)
+        _webcam.capture(300, 0.01)
+        _webcam.plot_history_intensity()
 
         print(_webcam.history)
 
@@ -22,7 +23,7 @@ def main(argv):
 
 
 def printevent(sender, args):
-    print('captured')
+    print('captured at {0}'.format(args))
 
 def printcomplete(sender, args):
     print('Captured finished')

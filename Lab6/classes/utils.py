@@ -6,6 +6,8 @@ import sys
 from time import clock, process_time, time, perf_counter
 import numpy as np
 from copy import copy, deepcopy
+from webcolors import rgb_to_name
+
 
 #region Various Math functions
 
@@ -67,6 +69,10 @@ def percent_within_StdDev(data, stddev=0, multiplier=1):
             counter +=1
 
     return counter/len(data)
+
+
+def root(self, a=0, b=0, c=0):
+    raise NotImplementedError()
 
 #endregion
 
@@ -320,8 +326,6 @@ def time_algorithms(algorithms, data, epochs=10, timers=[time, clock, process_ti
         print(ex)
 
 
-
-
 def __timethis(func, data, epochs, timers):
     tempdata = copy(data)
     retval = []
@@ -341,10 +345,28 @@ def __timethis(func, data, epochs, timers):
 
 #endregion
 
+#region Helpers
 
-#region Math
+#Convert a 3-tuple of integers, suitable for use in an rgb() color triplet,
+#to its corresponding normalized color name,
+#if any such name exists; valid values are html4, css2, css21 and css3, and the default is css3.
 
-def root(self, a=0, b=0, c=0):
-    raise NotImplementedError()
+def get_colour_name(rgb, palette='css3'):
+    try:
+        colorname = rgb_to_name(rgb, spec=palette)
+        return colorname
+    except:
+        return 'Undefined'
+
+def find_colour_name(rgb):
+    palettes = ['css3', 'html4', 'css2', 'css21']
+    for palette in palettes:
+        colour = get_colour_name(rgb, palette)
+        if colour != 'Undefined': return colour
+
+    return 'Undefined'
+
 
 #endregion
+
+

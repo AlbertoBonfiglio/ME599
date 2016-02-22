@@ -34,7 +34,7 @@ class Robot(object):
         width = int((window-1) /2)
         lenData = len(data)-1
 
-        for n in range(lenData):
+        for n in range(lenData+1):
             if n <= (width):  #
                 l = data[0:n+1]
                 r = data[n+1:(n+width)+1]

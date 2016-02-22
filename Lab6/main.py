@@ -9,9 +9,12 @@ import Lab6.classes.event
 def main(argv):
     try:
         _webcam = Webcamera()
+      #  _webcam.detect_event()
+        _webcam.detect_motion()
+
         _webcam.OnCapture += printevent
         _webcam.OnCaptureComplete += printcomplete
-        _webcam.capture(300, 0.01)
+        _webcam.capture(20, 0.005)
         _webcam.plot_history_intensity()
 
         print(_webcam.history)
@@ -23,7 +26,7 @@ def main(argv):
 
 
 def printevent(sender, args):
-    print('captured at {0}'.format(args))
+    print('captured at {0}'.format(args[0]))
 
 def printcomplete(sender, args):
     print('Captured finished')

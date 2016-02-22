@@ -74,6 +74,10 @@ def percent_within_StdDev(data, stddev=0, multiplier=1):
 def root(self, a=0, b=0, c=0):
     raise NotImplementedError()
 
+
+def euclidean_distance(a, b):
+    return sqrt((a[0]-b[0])**2 + (a[1]-b[1])**2)
+
 #endregion
 
 
@@ -345,6 +349,7 @@ def __timethis(func, data, epochs, timers):
 
 #endregion
 
+
 #region Helpers
 
 #Convert a 3-tuple of integers, suitable for use in an rgb() color triplet,
@@ -369,4 +374,6 @@ def find_colour_name(rgb):
 
 #endregion
 
+#region Filters
 
+#endregion

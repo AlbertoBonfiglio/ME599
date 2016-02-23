@@ -23,7 +23,7 @@ from Lab6.classes.filter import FilterHelper
 class Webcamera(Webcam):
 
     #TODO calculate the right threshold
-    __daylightThreshold = 100
+    __daylightThreshold = 75
 
     def __init__(self):
         super(Webcamera, self).__init__()
@@ -56,6 +56,8 @@ class Webcamera(Webcam):
 
                 args.append(_elapsed)
                 args.append(localtime())
+                args.append(_image_data)
+
                 self.OnCapture(self, args)
 
                 if _elapsed >= duration: _running = False
@@ -76,7 +78,8 @@ class Webcamera(Webcam):
             # thanks to SO: http://stackoverflow.com/a/12020860/377366
             _image_as_file = io.BytesIO(_image)
             _image_as_pil = Image.open(_image_as_file)
-            if persist: _image_as_pil.save(filename)
+            if persist:
+                _image_as_pil.save(filename)
 
             return _image_as_pil
 
@@ -142,78 +145,66 @@ class Webcamera(Webcam):
             print(ex)
 
 
-    def __preprocess_image(self, image, ratio=0.75):
-        #resize to make things faster, convert to grayscale,
-        ## and apply some gaussian blur to reduce aliasing
+    def __preprocess_image(self, image, ratio=0.75, blur=21):
+        #resize to make things a bit faster, convert to grayscale,
+        # and apply some gaussian blur to reduce aliasing and pixel differences
         _image = image.resize((int(image.width*ratio), int(image.height*ratio)))
-        #_image = ImageOps.grayscale(image)
-        #_image = image.filter(ImageFilter.GaussianBlur)
-        _image = cv2.cvtColor(numpy.array(_image), cv2.COLOR_RGB2BGR)
-        _image = cv2.cvtColor(_image, cv2.COLOR_BGR2GRAY)
-        _image = cv2.GaussianBlur(_image, (15, 15), 0)
+        _image = cv2.cvtColor(numpy.array(_image), cv2.COLOR_RGB2GRAY)
+        _image = cv2.GaussianBlur(_image, (blur, blur), 0)
 
         return _image
 
 
 
-    #TODO finetune mincontour, remove imgshow, test in daylight
+    #TODO finetune mincontour,
     # Gets two images and calculates the difference in pixels
-    def detect_motion(self, interval=1):
-        min_contour_area = 50
+    def detect_motion(self, interval=1.5):
+        min_contour_area = 40
+        max_contour_area = 250
         retval = False
-        threshold = 25
+        threshold = 65
         try:
-            #apply some gaussian blur to reduce aliasing (see wikipedia)
-            _image_static = Image.open('nopeeps.jpg')
-            _image_static = self.__preprocess_image(_image_static)
-            cv2.imshow('Static', _image_static)
+            #TODO write code to change static image if night
+            _image_static = self.save_image(persist=False)
+            _image_static = self.__preprocess_image(_image_static, .75, 7)
 
             sleep(interval) #defaults to one second
-            _image_dynamic1 = Image.open('peeps.jpg') #self.save_image(persist=True)
-            _image_dynamic1 = self.__preprocess_image(_image_dynamic1)
-            cv2.imshow('Frame', _image_dynamic1)
+
+            _image_dynamic1 = self.save_image(persist=False)
+            _image_dynamic1 = self.__preprocess_image(_image_dynamic1, .75, 7)
+
 
             # ideas from http://docs.opencv.org/master/d4/d73/tutorial_py_contours_begin.html#gsc.tab=0
+            #_delta1 = cv2.absdiff(_image_dynamic2, _image_dynamic1)
             _delta = cv2.absdiff(_image_dynamic1, _image_static)
-            cv2.imshow('Delta', _delta)
+            #_delta = cv2.bitwise_and(_delta1, _delta2)
 
             _threshold = cv2.threshold(_delta, 25, 255, cv2.THRESH_BINARY)[1]
-            cv2.imshow('Tresh', _threshold)
 
-            #TODO Evaluate if better
-            th3 = cv2.adaptiveThreshold(_delta,25,cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY,11,2)
-            cv2.imshow('Tresh', th3)
 
-            # dilate the thresholded image to fill in holes, then find contours
-            # on thresholded image
-            _threshold = cv2.dilate(_threshold, None, iterations=2)
-            cv2.imshow('Tresh', _threshold)
+            # dilate the thresholded image to fill in holes, then find contour on thresholded image
+            #_threshold = cv2.dilate(_threshold, None, iterations=2)
+
             (img, contours, _) = cv2.findContours(_threshold.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
             # loop over the contours
             text = 'None'
             for contour in contours:
                 # if the contour is too small, ignore it
-                if cv2.contourArea(contour) > min_contour_area:
+                _area = cv2.contourArea(contour)
+                if _area < min_contour_area or _area > max_contour_area:
                     continue # skip to the next
 
-
-
                 # compute the bounding box for the contour, draw it on the frame,
-                # and update the text
+                retval = True
                 (x, y, w, h) = cv2.boundingRect(contour)
                 cv2.rectangle(_image_dynamic1, (x, y), (x + w, y + h), (0, 255, 0), 2)
                 text = "Detected"
 
-
                 # draw the text and timestamp on the frame
-                cv2.putText(_image_dynamic1, "Motion: {}".format(text), (10, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
-                cv2.putText(_image_dynamic1, datetime.now().strftime("%A %d %B %Y %I:%M:%S%p"), (10, _image_dynamic1.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.35, (0, 0, 255), 1)
-
-            cv2.imshow('Result', _image_dynamic1)
-            cv2.imwrite('result.png', _image_dynamic1)
-
-            return retval
+                #cv2.putText(_image_dynamic1, "Motion: {}".format(text), (10, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+                #cv2.putText(_image_dynamic1, datetime.now().strftime("%A %d %B %Y %I:%M:%S%p"), (10, _image_dynamic1.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.35, (0, 0, 255), 1)
+            return retval, _image_dynamic1
 
         except Exception as ex:
             print(ex)
@@ -222,37 +213,53 @@ class Webcamera(Webcam):
 
     #TODO detect Event
     def detect_event(self):
-        retval = 0
+        crop_coord = (180, 320, 555, 490)
+        min_contour_area = 1000
+        max_contour_area = 3000
+        event_count = 0
+        threshold = 65
 
         try:
-             #resize to make things faster, convert to grayscale,
-            ## and apply some gaussian blur to reduce aliasing (see wikipedia)
-            _image_dynamic = self.save_image(persist=False).crop((190, 330, 545, 510))
-            _image_dynamic = self.__preprocess_image(_image_dynamic)
+            #convert to grayscale,
+            # and apply some gaussian blur to reduce aliasing (see wikipedia)
+            _image_dynamic = Image.open('event_day.jpg').crop(crop_coord) #self.save_image(persist=False).crop(crop_coord)
+            _image_dynamic = self.__preprocess_image(_image_dynamic, 1)
 
-            if self.daytime(self.image_average_intensity(_image_dynamic)) == True:
-                _image_static = Image.open('day.png')
-            else:
-                _image_static = Image.open('night.png')
+            _image_static = Image.open('nopeeps_day.jpg').crop(crop_coord)
+            _image_static = self.__preprocess_image(_image_static, 1)
 
-            _image_dynamic.save('dy.png')
+            # ideas from http://docs.opencv.org/master/d4/d73/tutorial_py_contours_begin.html#gsc.tab=0
+            _delta = cv2.absdiff(_image_dynamic, _image_static)
+            #cv2.imshow('delta', _delta)
+            _threshold = cv2.threshold(_delta, 25, 255, cv2.THRESH_BINARY)[1]
 
-            _pixel_static = numpy.array(_image_static.getdata())
-            _pixel_dynamic = numpy.array(_image_dynamic.getdata())
+            #cv2.imshow('thres', _threshold)
 
-            counter = 0
-            for  p in range(len(_pixel_static)):
-                if numpy.mean(_pixel_static[p]) != numpy.mean(_pixel_dynamic[p]):
-                    counter += 1
+            # dilate the thresholded image to fill in holes, then find contour on thresholded image
+            _threshold = cv2.dilate(_threshold, None, iterations=2)
 
-            percentdiff = counter / len(_pixel_static)
+            (img, contours, _) = cv2.findContours(_threshold.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
+            # loop over the contours
+            text = 'None'
+            for contour in contours:
+                # if the contour is too small, ignore it
+                _area = cv2.contourArea(contour)
+                if _area < min_contour_area or _area > max_contour_area:
+                    continue # skip to the next
 
-            raise NotImplementedError
-            return retval
+                # compute the bounding box for the contour, draw it on the frame,
+                event_count +=1
+                (x, y, w, h) = cv2.boundingRect(contour)
+                cv2.rectangle(_image_dynamic, (x, y), (x + w, y + h), (0, 255, 0), 2)
+                text = "Detected"
+
+                # draw the text and timestamp on the frame
+            return (event_count > 0), event_count, _image_dynamic
 
         except Exception as ex:
             print(ex)
+
 
 
 

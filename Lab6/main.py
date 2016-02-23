@@ -5,20 +5,14 @@ from Lab6.classes.utils import *
 from Lab6.classes.grabber2 import Webcamera
 import Lab6.classes.event
 from PIL import Image
-
-def main(argv):
+import cv2
+import time
+def capture_and_show():
     try:
         _webcam = Webcamera()
-
-        int1 = _webcam.image_average_intensity(Image.open('peeps_day.jpg'))
-        int2 = _webcam.image_average_intensity(Image.open('night.jpg'))
-
-      #  _webcam.detect_event()
-        _webcam.detect_motion()
-
         _webcam.OnCapture += printevent
         _webcam.OnCaptureComplete += printcomplete
-        _webcam.capture(20, 0.005, True)
+        _webcam.capture(40, 0.005, False)
         _webcam.plot_history_intensity()
 
         print(_webcam.history)
@@ -27,14 +21,65 @@ def main(argv):
         print('Could not save image to file')
         print(ex)
 
+def detect_motion():
+    try:
+        _webcam = Webcamera()
+
+        winName = "Movement Indicator"
+        cv2.namedWindow(winName, cv2.WINDOW_NORMAL)
+        while True:
+            time.sleep(1)
+            try:
+                moveit, img = _webcam.detect_motion()
+                cv2.imshow(winName, img)
+                print('Movement detected {0}'.format(moveit))
+            except:
+                print('Error')
+
+            key = cv2.waitKey(10)
+            if key == 27:
+                cv2.destroyWindow(winName)
+                break
+    except Exception as ex:
+        print(ex)
+
+
+
+def  detect_events():
+    try:
+        _webcam = Webcamera()
+
+        print(_webcam.image_most_common_colour(Image.open('nopeeps_day.jpg'))    )
+        winName = "Event Indicator"
+        cv2.namedWindow(winName, cv2.WINDOW_NORMAL)
+        while True:
+            time.sleep(1)
+            try:
+                moveit, num, img = _webcam.detect_event()
+                cv2.imshow(winName, img)
+                print('Event detected {0}, Events: {1}'.format(moveit, num))
+            except:
+                print('Error')
+
+            key = cv2.waitKey(10)
+            if key == 27:
+                cv2.destroyWindow(winName)
+                break
+    except Exception as ex:
+        print(ex)
 
 
 def printevent(sender, args):
     print('captured at {0}'.format(args[0]))
+    img = args[2]
+    print('Is daytime {0}, average intensity: {1}, common colour: {2}'.format(img.daytime, img.intensity, img.most_common))
 
 def printcomplete(sender, args):
     print('Captured finished')
 
 if __name__ == '__main__':
-    main(sys.argv[1:])
+    #capture_and_show()
 
+    #detect_motion()
+
+    detect_events()

@@ -4,11 +4,15 @@ import sys
 from Lab6.classes.utils import *
 from Lab6.classes.grabber2 import Webcamera
 import Lab6.classes.event
-
+from PIL import Image
 
 def main(argv):
     try:
         _webcam = Webcamera()
+
+        int1 = _webcam.image_average_intensity(Image.open('peeps_day.jpg'))
+        int2 = _webcam.image_average_intensity(Image.open('night.jpg'))
+
       #  _webcam.detect_event()
         _webcam.detect_motion()
 

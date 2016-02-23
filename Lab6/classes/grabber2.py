@@ -1,21 +1,21 @@
 #!/usr/bin/python3
 
-
 import io
 import matplotlib.pyplot as plt
 import numpy
 import uuid
+import cv2
 
 
 from collections import Counter
 from datetime import datetime
-from PIL import Image, ImageDraw, ImageFilter, ImageChops, ImageOps
+from PIL import Image, ImageDraw, ImageFilter, ImageChops, ImageOps, ImageMath
 from urllib.request import urlopen # fix for Python3
 from time import time, mktime, sleep, localtime
 
 import Lab6.classes.event as event
 from Lab6.classes.grabber import Webcam
-from Lab6.classes.utils import find_colour_name
+from Lab6.classes.utils import get_closest_colour
 from Lab6.classes.filter import FilterHelper
 
 # Interface to the Oregon State University webcams.  This should work
@@ -34,7 +34,7 @@ class Webcamera(Webcam):
         self.OnCaptureComplete = event.Event()
 
 
-    def capture(self, duration=10, delay=0.01):
+    def capture(self, duration=10, delay=0.01, persist=False):
         try:
             self.history = []
 
@@ -43,7 +43,7 @@ class Webcamera(Webcam):
             while _running:
                 args = []
                 _filename = str(uuid.uuid4()) + '.jpg'
-                _image = self.save_image(_filename, False)
+                _image = self.save_image(_filename, persist)
                 _intensity = self.image_average_intensity(_image)
                 _daylight = self.daytime(_intensity)
                 _mcc = self.image_most_common_colour(_image)
@@ -58,10 +58,9 @@ class Webcamera(Webcam):
                 args.append(localtime())
                 self.OnCapture(self, args)
 
-                #TODO Fix timer
                 if _elapsed >= duration: _running = False
 
-                #sleep(delay)
+                #TODO add save and read back capability
 
             self.OnCaptureComplete(self, None)
         except Exception as ex:
@@ -101,8 +100,9 @@ class Webcamera(Webcam):
 
             rgb = colours[0][0]
             frequency = colours[0][1]
-            name = find_colour_name(rgb)
+            name = get_closest_colour(rgb)
 
+            #TODO ZFind better way to do colours
             return (rgb, frequency, name, (frequency/len(pixels)))
 
         except Exception as ex:
@@ -142,54 +142,77 @@ class Webcamera(Webcam):
             print(ex)
 
 
-    def __preprocess_image(self, image, ratio=0.5):
+    def __preprocess_image(self, image, ratio=0.75):
         #resize to make things faster, convert to grayscale,
         ## and apply some gaussian blur to reduce aliasing
-        #_image = image.resize((int(image.width*ratio), int(image.height*ratio)))
-        _image = ImageOps.grayscale(image)
-        _image = _image.filter(ImageFilter.GaussianBlur)
+        _image = image.resize((int(image.width*ratio), int(image.height*ratio)))
+        #_image = ImageOps.grayscale(image)
+        #_image = image.filter(ImageFilter.GaussianBlur)
+        _image = cv2.cvtColor(numpy.array(_image), cv2.COLOR_RGB2BGR)
+        _image = cv2.cvtColor(_image, cv2.COLOR_BGR2GRAY)
+        _image = cv2.GaussianBlur(_image, (15, 15), 0)
+
         return _image
 
 
 
-    #TODO detect motion
+    #TODO finetune mincontour, remove imgshow, test in daylight
+    # Gets two images and calculates the difference in pixels
     def detect_motion(self, interval=1):
+        min_contour_area = 50
         retval = False
         threshold = 25
         try:
             #apply some gaussian blur to reduce aliasing (see wikipedia)
-            _image_static = Image.open('nopeeps.jpg') #self.save_image(persist=False)
+            _image_static = Image.open('nopeeps.jpg')
             _image_static = self.__preprocess_image(_image_static)
+            cv2.imshow('Static', _image_static)
 
-            sleep(interval)
-            _image_dynamic = Image.open('peeps.jpg') #self.save_image(persist=False)
-            t = numpy.array(_image_dynamic.getdata())
-            _image_dynamic = self.__preprocess_image(_image_dynamic)
-            t1 = numpy.array(_image_dynamic.getdata())
+            sleep(interval) #defaults to one second
+            _image_dynamic1 = Image.open('peeps.jpg') #self.save_image(persist=True)
+            _image_dynamic1 = self.__preprocess_image(_image_dynamic1)
+            cv2.imshow('Frame', _image_dynamic1)
 
-            _image_difference = ImageOps.grayscale(ImageChops.difference(_image_dynamic, _image_static)).save('diff.png')
+            # ideas from http://docs.opencv.org/master/d4/d73/tutorial_py_contours_begin.html#gsc.tab=0
+            _delta = cv2.absdiff(_image_dynamic1, _image_static)
+            cv2.imshow('Delta', _delta)
 
-            ts = time()
-            for n in t1:
-                print(n)
-            t2 = time() - ts
+            _threshold = cv2.threshold(_delta, 25, 255, cv2.THRESH_BINARY)[1]
+            cv2.imshow('Tresh', _threshold)
 
-            #TODO now we need to figure out how to id the whiter silouhettes
-             # Count changed pixels
-             #   changedPixels = 0
-             #   for x in xrange(0, 100):
-             #       for y in xrange(0, 75):
-             #           # Just check green channel as it's the highest quality channel or convert to greyscale
-             #           pixdiff = abs(buffer1[x,y][1] - buffer2[x,y][1])
-             #           if pixdiff > threshold:
-             #               changedPixels += 1
+            #TODO Evaluate if better
+            th3 = cv2.adaptiveThreshold(_delta,25,cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY,11,2)
+            cv2.imshow('Tresh', th3)
 
-                # Check force capture
-             #   if forceCapture:
-             #       if time.time() - lastCapture > forceCaptureTime:
-             #           changedPixels = sensitivity + 1
+            # dilate the thresholded image to fill in holes, then find contours
+            # on thresholded image
+            _threshold = cv2.dilate(_threshold, None, iterations=2)
+            cv2.imshow('Tresh', _threshold)
+            (img, contours, _) = cv2.findContours(_threshold.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-            raise NotImplementedError
+            # loop over the contours
+            text = 'None'
+            for contour in contours:
+                # if the contour is too small, ignore it
+                if cv2.contourArea(contour) > min_contour_area:
+                    continue # skip to the next
+
+
+
+                # compute the bounding box for the contour, draw it on the frame,
+                # and update the text
+                (x, y, w, h) = cv2.boundingRect(contour)
+                cv2.rectangle(_image_dynamic1, (x, y), (x + w, y + h), (0, 255, 0), 2)
+                text = "Detected"
+
+
+                # draw the text and timestamp on the frame
+                cv2.putText(_image_dynamic1, "Motion: {}".format(text), (10, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+                cv2.putText(_image_dynamic1, datetime.now().strftime("%A %d %B %Y %I:%M:%S%p"), (10, _image_dynamic1.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.35, (0, 0, 255), 1)
+
+            cv2.imshow('Result', _image_dynamic1)
+            cv2.imwrite('result.png', _image_dynamic1)
+
             return retval
 
         except Exception as ex:

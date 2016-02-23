@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 import sys
-#from Lab6.classes.utils import *
+from Lab6.classes.utils import *
 from Lab6.classes.grabber2 import Webcamera
 import Lab6.classes.event
 
@@ -14,7 +14,7 @@ def main(argv):
 
         _webcam.OnCapture += printevent
         _webcam.OnCaptureComplete += printcomplete
-        _webcam.capture(20, 0.005)
+        _webcam.capture(20, 0.005, True)
         _webcam.plot_history_intensity()
 
         print(_webcam.history)

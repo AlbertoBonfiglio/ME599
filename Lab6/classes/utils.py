@@ -6,7 +6,7 @@ import sys
 from time import clock, process_time, time, perf_counter
 import numpy as np
 from copy import copy, deepcopy
-from webcolors import rgb_to_name
+from webcolors import CSS3_NAMES_TO_HEX, CSS3_HEX_TO_NAMES, rgb_to_name, hex_to_rgb
 
 
 #region Various Math functions
@@ -370,6 +370,39 @@ def find_colour_name(rgb):
         if colour != 'Undefined': return colour
 
     return 'Undefined'
+
+
+def get_closest_colour2(RGB, palette='css3'):
+    #adapted from https://gist.github.com/jdiscar/9144764
+    #At this time is only using the CSS3 palette
+    difference = 1000000000000000000000
+    for name in CSS3_NAMES_TO_HEX:
+        rgb = hex_to_rgb(CSS3_NAMES_TO_HEX[name])
+
+        hex = abs(RGB[0] - rgb[0])*256 + abs(RGB[1]-rgb[1])* 256 + abs(RGB[2] - rgb[2])* 256
+        if difference == 0 :
+            return name
+        elif hex < difference:
+            difference = hex
+            colour_name = name
+
+    return colour_name
+
+
+def get_closest_colour(RGB, palette='css3'):
+    #adapted from https://gist.github.com/jdiscar/9144764
+    #At this time is only using the CSS3 palette
+    diff_colour = {}
+    for name, hexvalue in CSS3_NAMES_TO_HEX.items():
+        rgb = hex_to_rgb(hexvalue)
+
+        r = abs(rgb[0] - RGB[0])** 2
+        g = abs(rgb[1] - RGB[1])** 2
+        b = abs(rgb[2] - RGB[2])** 2
+
+        diff_colour[(r+g+b)] = name
+
+    return diff_colour[min(diff_colour.keys())]
 
 
 #endregion

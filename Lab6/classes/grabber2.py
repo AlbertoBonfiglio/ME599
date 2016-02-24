@@ -76,12 +76,11 @@ class Webcamera(Webcam):
             _image = urlopen('{0}/axis-cgi/jpg/image.cgi'.format(self.url)).read()
             # convert directly to an Image instead of saving / reopening
             # thanks to SO: http://stackoverflow.com/a/12020860/377366
-            _image_as_file = io.BytesIO(_image)
-            _image_as_pil = Image.open(_image_as_file)
+            _image = Image.open(io.BytesIO(_image))
             if persist:
-                _image_as_pil.save(filename)
+                _image.save(filename)
 
-            return _image_as_pil
+            return _image
 
         except Exception as ex:
             print(ex)
@@ -105,7 +104,6 @@ class Webcamera(Webcam):
             frequency = colours[0][1]
             name = get_closest_colour(rgb)
 
-            #TODO ZFind better way to do colours
             return (rgb, frequency, name, (frequency/len(pixels)))
 
         except Exception as ex:

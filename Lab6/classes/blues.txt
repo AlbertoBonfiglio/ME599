@@ -1,0 +1,16 @@
+248	248	255		#F8F8FF		Ghost White		98		240	100	99
+204	204	255		#CCCCFF		Lavender Blue		84		240	100	90
+196	195	208		#C4C3D0		Lavender Gray		78		245	12	79
+146	161	207		#92A1CF		Ceil		66		225	39	69
+140	146	172		#8C92AC		Cool Grey		59		229	16	61
+0	0	255		#0000FF		Blue		44		240	100	50
+42	82	190		#2A52BE		Cerulean Blue		41		224	64	45
+0	47	167		#002FA7		International Klein Blue		32		223	100	33
+0	51	153		#003399		Dark Powder Blue		30		220	100	30
+0	0	156		#00009C		Duke Blue		27		240	100	31
+18	10	143		#120A8F		Ultramarine		25		244	87	30
+0	0	139		#00008B		Dark Blue		24		240	100	27
+0	0	128		#000080		Navy Blue		22		240	100	25
+25	25	112		#191970		Midnight Blue		22		240	64	27
+8	37	103		#082567		Sapphire		21		222	86	22
+0	35	102		#002366		Royal Blue		20		219	100	20

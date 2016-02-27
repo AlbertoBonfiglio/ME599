@@ -18,6 +18,9 @@ from Lab6.classes.grabber import Webcam
 from Lab6.classes.utils import get_closest_colour
 from Lab6.classes.filter import FilterHelper
 
+
+
+
 # Interface to the Oregon State University webcams.  This should work
 # with any web-enabled AXIS camera system.
 class Webcamera(Webcam):
@@ -28,6 +31,7 @@ class Webcamera(Webcam):
     def __init__(self):
         super(Webcamera, self).__init__()
         self.history = []
+        self.colors = ImageColors()
 
         self.filter = FilterHelper()
         self.OnCapture = event.Event()
@@ -130,14 +134,6 @@ class Webcamera(Webcam):
                 y1 = self.filter.filterData(y, 5)
                 ax[1].plot(x, y1)
 
-                    #ax.set_xlabel('{0} #'.format(scaptions[col]), fontsize='small')
-                    #ax.set_ylabel('Time (s)', fontsize='small')
-                    #ax.set_xticks(position + (width/t_groups) *2)
-
-                    #ax.legend(bars, tcaptions, fontsize='small', loc='upper left', shadow=True)
-                    #ax.axis('tight')
-
-                    #col +=1
             plt.show()
         except Exception as ex:
             print(ex)
@@ -151,6 +147,24 @@ class Webcamera(Webcam):
         _image = cv2.GaussianBlur(_image, (blur, blur), 0)
 
         return _image
+
+
+    def funkyfy(self, image=None, rgb=None, useopencv=True):
+        if rgb == None:
+            rgb = (numpy.random.randint(0,255), numpy.random.randint(0,255), numpy.random.randint(0,255))
+
+        if image == None:
+            image = self.save_image(persist=True) #gets a webcam image
+
+        image = cv2.cvtColor(numpy.array(image), cv2.COLOR_RGB2HSV)
+        #image = cv2.cvtColor(numpy.array(image), cv2.COLOR_RGB2HSV_FULL)
+        boundary = ([50, 50, 50], [100, 100, 100]) #reds
+
+        mask = cv2.inRange(image, numpy.array(boundary[0]), numpy.array(boundary[1]))
+        image = cv2.bitwise_and(image, image, mask = mask)
+
+        return image
+
 
 
 
@@ -285,6 +299,26 @@ class WebImage(object):
 
     def most_common_percent(self):
         return self.most_common[4]
+
+
+class ImageColor(object):
+    def __init__(self, name, hex, rgb, luminosity, hue, saturation, light, palette, group ):
+        self.name = name
+        self.hex = hex
+        self.rgb = rgb
+        self.luminosity = luminosity
+        self.hue = hue
+        self.saturation = saturation
+        self. light = light
+        self.palette = palette
+        self.group = group
+
+
+class ImageColors(object):
+    def __init__(self):
+        self.colors = []
+
+
 
 
 

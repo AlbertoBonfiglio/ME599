@@ -1,12 +1,14 @@
 #!/usr/bin/python3
 
 import sys
-from Lab6.classes.utils import *
-from Lab6.classes.grabber2 import Webcamera
-import Lab6.classes.event
+from classes.utils import *
+from classes.grabber2 import Webcamera
+import classes.event
 from PIL import Image
 import cv2
 import time
+
+
 def capture_and_show():
     try:
         _webcam = Webcamera()
@@ -44,7 +46,6 @@ def detect_motion():
         print(ex)
 
 
-
 def  detect_events():
     try:
         _webcam = Webcamera()
@@ -69,6 +70,28 @@ def  detect_events():
         print(ex)
 
 
+def funkyfy():
+    try:
+        _webcam = Webcamera()
+        winName = "Event Indicator"
+        cv2.namedWindow(winName, cv2.WINDOW_NORMAL)
+        while True:
+            time.sleep(1)
+            try:
+                img = _webcam.funkyfy()
+                cv2.imshow(winName, img)
+            except:
+                print('Error')
+
+            key = cv2.waitKey(10)
+            if key == 27:
+                cv2.destroyWindow(winName)
+                break
+    except Exception as ex:
+        print(ex)
+
+
+
 def printevent(sender, args):
     print('captured at {0}'.format(args[0]))
     img = args[2]
@@ -78,8 +101,11 @@ def printcomplete(sender, args):
     print('Captured finished')
 
 if __name__ == '__main__':
+
+    funkyfy()
+
     #capture_and_show()
 
     #detect_motion()
 
-    detect_events()
+    #detect_events()

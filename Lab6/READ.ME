@@ -1,14 +1,16 @@
 Written using python3.5
-All code was written by me.
-Most of the mathematical formulas to deal with complex numbers math were taken from:
-Wikipedia
-http://www.mesacc.edu/~scotz47781/mat120/notes/complex/dividing/dividing_complex.html
-http://www.sparknotes.com/math/algebra2/complexnumbers/section2.rhtml
+All image processing code was written by me.
+Some classes were imported from existing packages (opencv3, webcolors and event)
+Ideas on how to process images to extrapolate differences from opencv documentation,
+Pillow documentation and research on stack exchange
 
-1) Just type ./main.py
-    The program will print rhe circle function results based on a random radius
-    then will print the result of the requested complex operations
+1) In main.py remove the comment from the functions to test
+  save and then type ./main.py
 
-2) in the folder test there are unit tests for both classes
+2) It performs basic recognition. Not all movements are recognized and since we're basing
+  our algorithm on image differences at night turning a light on is recognized as 'movement'
+  Additionally the webacmera event detection algorithm uses a made up image for mocking and showing detection
+  as when written there were no events on the square. Also, as mentioned above, due to the algorithm chosen
+  a group of people standing close together may be classified as an event....
 
-3) Root has not been implemented due to not having time (baby, wife, and work... :-( )
+

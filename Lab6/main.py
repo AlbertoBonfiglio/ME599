@@ -4,9 +4,11 @@ import sys
 from classes.utils import *
 from classes.grabber2 import Webcamera
 import classes.event
+import Lab6.hsv_gui as hg
 from PIL import Image
 import cv2
 import time
+import tkinter as tk
 
 
 def capture_and_show():
@@ -71,6 +73,11 @@ def  detect_events():
 
 
 def funkyfy():
+
+    root = tk.Tk()
+    app = hg.HsvGui(master=root)
+    app.mainloop()
+
     try:
         _webcam = Webcamera()
         winName = "Event Indicator"

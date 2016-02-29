@@ -16,7 +16,7 @@ class HsvGui(tk.Frame):
         self.root = master
 
         self.Webcam = G2.Webcamera()
-        self.baseImage = self.Webcam.save_image(persist=False)
+        self.baseImage = self.Webcam.save_image(persist=True)
         self.baseImage = cv2.cvtColor(numpy.array(self.baseImage), cv2.COLOR_RGB2BGR)
         self.createWidgets()
         self.OnValueChange = event.Event()
@@ -84,8 +84,8 @@ class HsvGui(tk.Frame):
         self.valueLabel['text'] = '{0}-{1}-{2} to {3}-{4}-{5}'.format(H, S, V, Hmax, Smax, Vmax)
         self.OnValueChange(self, _args)
 
-        output, a, b, c = self.Webcam.funkyfy(self.baseImage)# , ([H,S,V],[Hmax, Smax, Vmax]))
+        output, a = self.Webcam.funkyfy(self.baseImage)# , ([H,S,V],[Hmax, Smax, Vmax]))
 
-        cv2.imshow(self.title, numpy.hstack([self.baseImage, output, a, b, c]))
+        cv2.imshow(self.title, numpy.hstack([self.baseImage, output, a ]))
 
 

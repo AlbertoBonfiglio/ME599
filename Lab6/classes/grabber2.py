@@ -148,11 +148,12 @@ class Webcamera(Webcam):
 
         return _image
 
-
-    def funkyfy(self, image=None, boundary=([40, 100, 50], [80, 255, 255 ]), rgb=None, useopencv=True):
+    #TODO 1) find a way to filter out black from color
+    #TODO 2) merge the two images (loop?)
+    # Consider just looping through the mask and pick the correspoding pixel color from the image
+    # using a conversion palette
+    def funkyfy(self, image=None, boundary=([40, 100, 50], [80, 255, 255])):
         [26, 45, 64], [78, 160, 143 ]
-        if rgb == None:
-            rgb = (numpy.random.randint(0,255), numpy.random.randint(0,255), numpy.random.randint(0,255))
 
         if image == None:
             _image = self.save_image(persist=True) #gets a webcam image
@@ -176,16 +177,13 @@ class Webcamera(Webcam):
         out1 = cv2.merge((h, s,v))
         out1 = cv2.cvtColor(out1, cv2.COLOR_HSV2BGR)
 
+        out1 = _image.copyTo()
         #out1[0, :, :] = 0
         #out1[:, 1, :] = 0
         #out1[:, :, 2] = 0
 
-        outnot = cv2.bitwise_not(_image, _image, mask=mask)
-        outxor = cv2.bitwise_xor(_image, _image, mask=mask)
-        #out[:, 0, :] = 0 # removes the green channel
-        #out[:, :, 0] += 60 # increases the blue channel
 
-        return out, out1, outnot, outxor
+        return out, out1
 
 
 

@@ -72,12 +72,36 @@ def  detect_events():
         print(ex)
 
 
+
+
 def funkyfy():
+    global H, S, V, Hmax, Smax, Vmax
+    H,S, V, Hmax, Vmax, Smax = 0,0,0,0,0,0
 
     root = tk.Tk()
     app = hg.HsvGui(master=root)
+    #app.OnValueChange += changeHSVevent
     app.mainloop()
 
+
+
+
+
+
+def changeHSVevent(sender, args):
+    H = args[0][0]
+    S = args[0][1]
+    V = args[0][2]
+
+    Hmax = args[1][0]
+    Smax = args[1][1]
+    Vmax = args[1][2]
+
+    print('New HSV values = {0}-{1}-{2}. Sender = {3}'.format(H, S, V, sender ))
+
+0
+
+def test():
     try:
         _webcam = Webcamera()
         winName = "Event Indicator"

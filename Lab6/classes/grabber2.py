@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import numpy
 import uuid
 import cv2
-
+import copy
 
 from collections import Counter
 from datetime import datetime
@@ -149,21 +149,43 @@ class Webcamera(Webcam):
         return _image
 
 
-    def funkyfy(self, image=None, rgb=None, useopencv=True):
+    def funkyfy(self, image=None, boundary=([40, 100, 50], [80, 255, 255 ]), rgb=None, useopencv=True):
+        [26, 45, 64], [78, 160, 143 ]
         if rgb == None:
             rgb = (numpy.random.randint(0,255), numpy.random.randint(0,255), numpy.random.randint(0,255))
 
         if image == None:
-            image = self.save_image(persist=True) #gets a webcam image
+            _image = self.save_image(persist=True) #gets a webcam image
+        else:
+            _image = copy.copy(image)
 
-        image = cv2.cvtColor(numpy.array(image), cv2.COLOR_RGB2HSV)
-        #image = cv2.cvtColor(numpy.array(image), cv2.COLOR_RGB2HSV_FULL)
-        boundary = ([50, 50, 50], [100, 100, 100]) #reds
+        _image = cv2.cvtColor(numpy.array(_image), cv2.COLOR_BGR2HSV_FULL)
 
-        mask = cv2.inRange(image, numpy.array(boundary[0]), numpy.array(boundary[1]))
-        image = cv2.bitwise_and(image, image, mask = mask)
+        mask = cv2.inRange(_image, numpy.array(boundary[0]), numpy.array(boundary[1]))
+        out = cv2.bitwise_and(_image, _image, mask=mask)
 
-        return image
+        out1 = cv2.bitwise_or(_image, _image, mask=mask)
+        out1 = cv2.cvtColor(out1, cv2.COLOR_HSV2BGR)
+        h,s,v, = cv2.split(out1)
+
+        h[:] += 50
+        #s[:] += 20
+        #v[:] = 0
+
+
+        out1 = cv2.merge((h, s,v))
+        out1 = cv2.cvtColor(out1, cv2.COLOR_HSV2BGR)
+
+        #out1[0, :, :] = 0
+        #out1[:, 1, :] = 0
+        #out1[:, :, 2] = 0
+
+        outnot = cv2.bitwise_not(_image, _image, mask=mask)
+        outxor = cv2.bitwise_xor(_image, _image, mask=mask)
+        #out[:, 0, :] = 0 # removes the green channel
+        #out[:, :, 0] += 60 # increases the blue channel
+
+        return out, out1, outnot, outxor
 
 
 

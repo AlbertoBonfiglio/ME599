@@ -15,3 +15,29 @@
 ,'seagreen'
 ,'springgreen'
 ,'yellowgreen'
+
+
+
+            for row in range(len(image_hsv)):
+                for hsv in range(len(image_hsv[row])):
+                    tup = (image_hsv[row][hsv][0], image_hsv[row][hsv][1], image_hsv[row][hsv][2])
+                    color = get_closest_colour(tup)
+
+                    if any(color in s for s in colors):
+                        print(color)
+
+
+
+                    #if h[row][hue] > 25 and h[row][hue] < 50:
+                    #    h[row][hue] = 180 #h[row][hue] + 40
+
+
+            output_hsv = cv2.cvtColor(numpy.array(image_hsv), cv2.COLOR_BGR2RGB)
+
+            #lower = numpy.array([35,50,50]) #example value
+            #upper = numpy.array([80,255,255]) #example value
+            #mask0 = cv2.inRange(image_hsv, lower_red, upper_red)
+
+
+
+            #return mask0

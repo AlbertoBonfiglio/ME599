@@ -45,7 +45,7 @@ class HsvGui(tk.Frame):
         self.valueLabel.grid(row=0, column=1, sticky=W)
 
         self.Hvalue = Scale(self.root, from_=0, to=255, orient=HORIZONTAL, command=self.__sliderCallback)
-        self.Hvalue.grid( row=1, column=1)
+        self.Hvalue.grid(row=1, column=1)
 
         self.Svalue = Scale(self.root, from_=0, to=255, orient=HORIZONTAL, command=self.__sliderCallback)
         self.Svalue.grid( row=2, column=1)
@@ -70,22 +70,21 @@ class HsvGui(tk.Frame):
 
 
     def __sliderCallback(self, args):
-        _args = []
+
         H = int(self.Hvalue.get())
         S = int(self.Svalue.get())
         V = int(self.Vvalue.get())
-        _args.append((H, S, V))
+        lower = [H, S, V]
 
         Hmax = int(self.HvalueMax.get())
         Smax = int(self.SvalueMax.get())
         Vmax = int(self.VvalueMax.get())
-        _args.append((H, S, V))
+        upper= [Hmax, Smax, Vmax]
 
-        self.valueLabel['text'] = '{0}-{1}-{2} to {3}-{4}-{5}'.format(H, S, V, Hmax, Smax, Vmax)
-        self.OnValueChange(self, _args)
+        #self.valueLabel['text'] = '{0}-{1}-{2} to {3}-{4}-{5}'.format(H, S, V, Hmax, Smax, Vmax)
 
-        output, a = self.Webcam.funkyfy(self.baseImage)# , ([H,S,V],[Hmax, Smax, Vmax]))
+        output, a = self.Webcam.funkyfy(colorrange=(lower, upper))
 
-        cv2.imshow(self.title, numpy.hstack([self.baseImage, output, a ]))
+        cv2.imshow(self.title, numpy.hstack([output, a]))
 
 

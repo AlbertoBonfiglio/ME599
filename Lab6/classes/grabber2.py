@@ -166,45 +166,43 @@ class Webcamera(Webcam):
         return _image
 
 
-    def funkyfy(self, image=None, rgb=None, useopencv=True):
+    def funkyfy(self, image=None, colorrange=([0,100,0],[255, 255,120]), useopencv=True):
         try:
+            if colorrange ==None:
+                colorrange = ([numpy.random.randint(0,255), numpy.random.randint(0,255), numpy.random.randint(0,255)],
+                              [numpy.random.randint(0,255), numpy.random.randint(0,255), numpy.random.randint(0,255)])
 
-            if rgb == None:
-                rgb = (numpy.random.randint(0,255), numpy.random.randint(0,255), numpy.random.randint(0,255))
+            #if rgb == None:
+            #    rgb = (numpy.random.randint(0,255), numpy.random.randint(0,255), numpy.random.randint(0,255))
 
             if image == None:
                 image = self.save_image(persist=False) #gets a webcam image
 
+            image = image.resize((int(image.width*0.5), int(image.height*0.5)))
+            image_bgr = cv2.cvtColor(numpy.array(image), cv2.COLOR_RGB2BGR)
 
-            #image_bgr = cv2.cvtColor(numpy.array(image), cv2.COLOR_RGB2BGR)
-            image_hsv = image.copy()
+            lower = numpy.array(colorrange[0], dtype="uint8")
+            upper = numpy.array(colorrange[1], dtype="uint8")
 
-            for row in range(len(image_hsv)):
-                for hsv in range(len(image_hsv[row])):
-                    tup = (image_hsv[row][hsv][0], image_hsv[row][hsv][1], image_hsv[row][hsv][2])
-                    color = get_closest_colour(tup)
+            mask = cv2.inRange(image_bgr, lower, upper)
+            output = cv2.bitwise_and(image_bgr, image_bgr, mask = mask)
 
-                    if any(color in s for s in colors):
-                        print(color)
-
-
-
-                    #if h[row][hue] > 25 and h[row][hue] < 50:
-                    #    h[row][hue] = 180 #h[row][hue] + 40
+            b, g, r = cv2.split(output)
+            g[g>0] = 255
 
 
-            output_hsv = cv2.cvtColor(numpy.array(image_hsv), cv2.COLOR_BGR2RGB)
+            output = cv2.merge((g,b,r))
 
-            #lower = numpy.array([35,50,50]) #example value
-            #upper = numpy.array([80,255,255]) #example value
-            #mask0 = cv2.inRange(image_hsv, lower_red, upper_red)
+            for row in range(len(output)):
+                for col in range(len(output[row])):
+                    tup = (output[row][col])
+                    if any(v != 0 for v in tup):
+                        image_bgr[row][col] = tup
 
 
 
-            #return mask0
 
-
-            return image_hsv
+            return image_bgr, output
         except Exception as ex:
             print(ex)
 

@@ -9,6 +9,7 @@ from PIL import Image
 import cv2
 import time
 import tkinter as tk
+import numpy
 
 
 def capture_and_show():
@@ -72,8 +73,6 @@ def  detect_events():
         print(ex)
 
 
-
-
 def funkyfy():
     global H, S, V, Hmax, Smax, Vmax
     H,S, V, Hmax, Vmax, Smax = 0,0,0,0,0,0
@@ -82,10 +81,6 @@ def funkyfy():
     app = hg.HsvGui(master=root)
     #app.OnValueChange += changeHSVevent
     app.mainloop()
-
-
-
-
 
 
 def changeHSVevent(sender, args):
@@ -99,7 +94,6 @@ def changeHSVevent(sender, args):
 
     print('New HSV values = {0}-{1}-{2}. Sender = {3}'.format(H, S, V, sender ))
 
-0
 
 def test():
     try:
@@ -109,8 +103,8 @@ def test():
         while True:
             time.sleep(1)
             try:
-                img = _webcam.funkyfy()
-                cv2.imshow(winName, img)
+                img, funk = _webcam.funkyfy()
+                cv2.imshow(winName, numpy.hstack([img, funk]))
 
             except:
                 print('Error')
@@ -134,10 +128,11 @@ def printcomplete(sender, args):
 
 if __name__ == '__main__':
 
-    #funkyfy()
+    funkyfy()
 
+    test()
     #capture_and_show()
 
-    detect_motion()
+    #detect_motion()
 
     #detect_events()

@@ -19,7 +19,23 @@ from Lab6.classes.utils import get_closest_colour
 from Lab6.classes.filter import FilterHelper
 
 
-
+colors = ['chartreuse', 'darkgreen', 'darkolivegreen','darkseagreen'
+'darkturquoise','forestgreen','green'
+,'greenyellow'
+,'lawngreen'
+,'lightgreen'
+,'lightseagreen'
+,'lime'
+,'limegreen'
+,'mediumseagreen'
+,'mediumspringgreen'
+,'olive'
+,'olivedrab'
+,'palegoldenrod'
+,'palegreen'
+,'seagreen'
+,'springgreen'
+,'yellowgreen']
 
 # Interface to the Oregon State University webcams.  This should work
 # with any web-enabled AXIS camera system.
@@ -143,80 +159,106 @@ class Webcamera(Webcam):
         #resize to make things a bit faster, convert to grayscale,
         # and apply some gaussian blur to reduce aliasing and pixel differences
         _image = image.resize((int(image.width*ratio), int(image.height*ratio)))
-        _image = cv2.cvtColor(numpy.array(_image), cv2.COLOR_RGB2GRAY)
+        #_image = cv2.cvtColor(numpy.array(_image), cv2.COLOR_RGB2GRAY)
         _image = cv2.GaussianBlur(_image, (blur, blur), 0)
+        #_image = cv2.Blur(_image, (blur, blur))
 
         return _image
 
 
     def funkyfy(self, image=None, rgb=None, useopencv=True):
-        if rgb == None:
-            rgb = (numpy.random.randint(0,255), numpy.random.randint(0,255), numpy.random.randint(0,255))
+        try:
 
-        if image == None:
-            image = self.save_image(persist=True) #gets a webcam image
+            if rgb == None:
+                rgb = (numpy.random.randint(0,255), numpy.random.randint(0,255), numpy.random.randint(0,255))
 
-        image = cv2.cvtColor(numpy.array(image), cv2.COLOR_RGB2HSV)
-        #image = cv2.cvtColor(numpy.array(image), cv2.COLOR_RGB2HSV_FULL)
-        boundary = ([50, 50, 50], [100, 100, 100]) #reds
+            if image == None:
+                image = self.save_image(persist=False) #gets a webcam image
 
-        mask = cv2.inRange(image, numpy.array(boundary[0]), numpy.array(boundary[1]))
-        image = cv2.bitwise_and(image, image, mask = mask)
 
-        return image
+            #image_bgr = cv2.cvtColor(numpy.array(image), cv2.COLOR_RGB2BGR)
+            image_hsv = image.copy()
 
+            for row in range(len(image_hsv)):
+                for hsv in range(len(image_hsv[row])):
+                    tup = (image_hsv[row][hsv][0], image_hsv[row][hsv][1], image_hsv[row][hsv][2])
+                    color = get_closest_colour(tup)
+
+                    if any(color in s for s in colors):
+                        print(color)
+
+
+
+                    #if h[row][hue] > 25 and h[row][hue] < 50:
+                    #    h[row][hue] = 180 #h[row][hue] + 40
+
+
+            output_hsv = cv2.cvtColor(numpy.array(image_hsv), cv2.COLOR_BGR2RGB)
+
+            #lower = numpy.array([35,50,50]) #example value
+            #upper = numpy.array([80,255,255]) #example value
+            #mask0 = cv2.inRange(image_hsv, lower_red, upper_red)
+
+
+
+            #return mask0
+
+
+            return image_hsv
+        except Exception as ex:
+            print(ex)
 
 
 
     #TODO finetune mincontour,
     # Gets two images and calculates the difference in pixels
-    def detect_motion(self, interval=1.5):
-        min_contour_area = 40
-        max_contour_area = 250
+    def detect_motion(self, interval=0.5):
+        min_contour_area = 5
+        max_contour_area = 1250
         retval = False
         threshold = 65
         try:
             #TODO write code to change static image if night
+            _image_static = None
             _image_static = self.save_image(persist=False)
-            _image_static = self.__preprocess_image(_image_static, .75, 7)
-
+            _image_static = cv2.cvtColor(numpy.array(_image_static), cv2.COLOR_RGB2GRAY)
+            _image_static = cv2.GaussianBlur(_image_static, (21, 21), 0)
             sleep(interval) #defaults to one second
 
-            _image_dynamic1 = self.save_image(persist=False)
-            _image_dynamic1 = self.__preprocess_image(_image_dynamic1, .75, 7)
-
+            _image_dynamic = self.save_image(persist=False)
+            _image_dynamic= cv2.cvtColor(numpy.array(_image_dynamic), cv2.COLOR_RGB2GRAY)
+            _image_dynamic1 = cv2.GaussianBlur(_image_dynamic, (21, 21), 0)
 
             # ideas from http://docs.opencv.org/master/d4/d73/tutorial_py_contours_begin.html#gsc.tab=0
-            #_delta1 = cv2.absdiff(_image_dynamic2, _image_dynamic1)
             _delta = cv2.absdiff(_image_dynamic1, _image_static)
-            #_delta = cv2.bitwise_and(_delta1, _delta2)
 
             _threshold = cv2.threshold(_delta, 25, 255, cv2.THRESH_BINARY)[1]
 
-
             # dilate the thresholded image to fill in holes, then find contour on thresholded image
-            #_threshold = cv2.dilate(_threshold, None, iterations=2)
+            _threshold = cv2.dilate(_threshold, None, iterations=2)
 
+            #TODO evaluate different parameters
             (img, contours, _) = cv2.findContours(_threshold.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            #(img, contours, _) = cv2.findContours(_threshold.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
             # loop over the contours
-            text = 'None'
             for contour in contours:
                 # if the contour is too small, ignore it
                 _area = cv2.contourArea(contour)
                 if _area < min_contour_area or _area > max_contour_area:
-                    continue # skip to the next
+                    continue  # skip to the next
 
                 # compute the bounding box for the contour, draw it on the frame,
                 retval = True
                 (x, y, w, h) = cv2.boundingRect(contour)
-                cv2.rectangle(_image_dynamic1, (x, y), (x + w, y + h), (0, 255, 0), 2)
-                text = "Detected"
+                cv2.rectangle(_image_dynamic, (x, y), (x + w, y + h), (0, 12, 255), 2)
+                #cv2.ellipse(_image_dynamic, (x, y+20), (10, 20), 90, 0, 360, (255, 0, 0), 2)
+                #cv2.ellipse(_image_dynamic1,(200,200),(80,50),45,0,360,(0,0,255),1)
 
                 # draw the text and timestamp on the frame
                 #cv2.putText(_image_dynamic1, "Motion: {}".format(text), (10, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
                 #cv2.putText(_image_dynamic1, datetime.now().strftime("%A %d %B %Y %I:%M:%S%p"), (10, _image_dynamic1.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.35, (0, 0, 255), 1)
-            return retval, _image_dynamic1
+            return retval, _image_dynamic
 
         except Exception as ex:
             print(ex)

@@ -30,12 +30,12 @@ def detect_motion():
         winName = "Movement Indicator"
         cv2.namedWindow(winName, cv2.WINDOW_NORMAL)
         while True:
-            time.sleep(1)
+            #time.sleep(1)
             try:
                 moveit, img = _webcam.detect_motion()
                 cv2.imshow(winName, img)
                 print('Movement detected {0}'.format(moveit))
-            except:
+            except Exception as ex:
                 print('Error')
 
             key = cv2.waitKey(10)
@@ -80,6 +80,7 @@ def funkyfy():
             try:
                 img = _webcam.funkyfy()
                 cv2.imshow(winName, img)
+
             except:
                 print('Error')
 
@@ -102,10 +103,10 @@ def printcomplete(sender, args):
 
 if __name__ == '__main__':
 
-    funkyfy()
+    #funkyfy()
 
     #capture_and_show()
 
-    #detect_motion()
+    detect_motion()
 
     #detect_events()

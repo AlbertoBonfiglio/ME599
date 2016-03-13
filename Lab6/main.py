@@ -128,7 +128,7 @@ def printcomplete(sender, args):
 
 if __name__ == '__main__':
 
-    funkyfy()
+    #funkyfy()
 
     test()
     #capture_and_show()

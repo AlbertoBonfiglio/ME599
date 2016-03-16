@@ -16,7 +16,7 @@ class HsvGui(tk.Frame):
         self.root = master
 
         self.Webcam = G2.Webcamera()
-        self.baseImage = self.Webcam.save_image(persist=True)
+        self.baseImage = self.Webcam.save_image(persist=False)
         self.baseImage = cv2.cvtColor(numpy.array(self.baseImage), cv2.COLOR_RGB2BGR)
         self.createWidgets()
         self.OnValueChange = event.Event()
@@ -26,6 +26,7 @@ class HsvGui(tk.Frame):
         cv2.startWindowThread()
         cv2.namedWindow(self.title, cv2.WINDOW_NORMAL)
         cv2.imshow(self.title, self.baseImage)
+        self.Funkify()
 
 
     def createWidgets(self):
@@ -46,31 +47,38 @@ class HsvGui(tk.Frame):
 
         self.Hvalue = Scale(self.root, from_=0, to=255, orient=HORIZONTAL, command=self.__sliderCallback)
         self.Hvalue.grid(row=1, column=1)
+        self.Hvalue.set(0)
 
         self.Svalue = Scale(self.root, from_=0, to=255, orient=HORIZONTAL, command=self.__sliderCallback)
         self.Svalue.grid( row=2, column=1)
+        self.Svalue.set(90)
 
         self.Vvalue = Scale(self.root, from_=0, to=255, orient=HORIZONTAL, command=self.__sliderCallback)
         self.Vvalue.grid( row=3, column=1)
-
+        self.Vvalue.set(0)
 
 
         self.HvalueMax = Scale(self.root, from_=0, to=255, orient=HORIZONTAL, command=self.__sliderCallback)
         self.HvalueMax.grid(row=4, column=1)
+        self.HvalueMax.set(255)
 
         self.SvalueMax = Scale(self.root, from_=0, to=255, orient=HORIZONTAL, command=self.__sliderCallback)
         self.SvalueMax.grid(row=5, column=1)
+        self.SvalueMax.set(255)
 
         self.VvalueMax = Scale(self.root, from_=0, to=255, orient=HORIZONTAL, command=self.__sliderCallback)
         self.VvalueMax.grid(row=6, column=1)
+        self.VvalueMax.set(120)
 
-
-        self.QUIT = tk.Button(self, text="QUIT", fg="red", command=self.root.destroy)
+        self.Go = tk.Button(self.root, text="Go!", fg="Green", command=self.Funkify)
+        self.Go.grid(row=7, column=0)
+        self.QUIT = tk.Button(self.root, text="QUIT", fg="red", command=self.root.destroy)
         self.QUIT.grid(row=7, column=1)
 
 
-    def __sliderCallback(self, args):
 
+
+    def Funkify(self):
         H = int(self.Hvalue.get())
         S = int(self.Svalue.get())
         V = int(self.Vvalue.get())
@@ -87,4 +95,7 @@ class HsvGui(tk.Frame):
 
         cv2.imshow(self.title, numpy.hstack([output, a]))
 
+
+    def __sliderCallback(self, args):
+        print('Sliding!!')
 

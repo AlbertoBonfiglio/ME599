@@ -49,6 +49,18 @@ def detect_motion():
         print(ex)
 
 
+def detect_motion_new():
+    try:
+        _webcam = Webcamera()
+        winName = "Movement Indicator"
+        cv2.namedWindow(winName, cv2.WINDOW_NORMAL)
+
+        _webcam.detect_motion_new(winName)
+
+    except Exception as ex:
+        print(ex)
+
+
 def  detect_events():
     try:
         _webcam = Webcamera()
@@ -130,9 +142,9 @@ if __name__ == '__main__':
 
     #funkyfy()
 
-    test()
+    #test()
     #capture_and_show()
 
-    #detect_motion()
+    detect_motion_new()
 
     #detect_events()

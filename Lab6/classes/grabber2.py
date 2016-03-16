@@ -155,31 +155,40 @@ class Webcamera(Webcam):
             print(ex)
 
 
+    def __image_rotate(self, image, angle=180):
+        (h, w) = image.shape[:2]
+        image_center = (w / 2, h / 2)
+
+        # rotate the image by 180 degrees
+        rotation_matrix = cv2.getRotationMatrix2D(image_center, angle, 1.0)
+        rotated = cv2.warpAffine(image, rotation_matrix, (w, h))
+
+        return rotated
+
+
     def __preprocess_image(self, image, ratio=0.75, blur=21):
         #resize to make things a bit faster, convert to grayscale,
         # and apply some gaussian blur to reduce aliasing and pixel differences
         _image = image.resize((int(image.width*ratio), int(image.height*ratio)))
-        #_image = cv2.cvtColor(numpy.array(_image), cv2.COLOR_RGB2GRAY)
         _image = cv2.GaussianBlur(_image, (blur, blur), 0)
-        #_image = cv2.Blur(_image, (blur, blur))
 
         return _image
 
 
     def funkyfy(self, image=None, colorrange=([0,100,0],[255, 255,120]), useopencv=True):
+        #Not the most elegant solution
         try:
             if colorrange ==None:
                 colorrange = ([numpy.random.randint(0,255), numpy.random.randint(0,255), numpy.random.randint(0,255)],
                               [numpy.random.randint(0,255), numpy.random.randint(0,255), numpy.random.randint(0,255)])
 
-            #if rgb == None:
-            #    rgb = (numpy.random.randint(0,255), numpy.random.randint(0,255), numpy.random.randint(0,255))
-
             if image == None:
                 image = self.save_image(persist=False) #gets a webcam image
 
             image = image.resize((int(image.width*0.5), int(image.height*0.5)))
+
             image_bgr = cv2.cvtColor(numpy.array(image), cv2.COLOR_RGB2BGR)
+            image_bgr = self.__image_rotate(image_bgr, 2)
 
             lower = numpy.array(colorrange[0], dtype="uint8")
             upper = numpy.array(colorrange[1], dtype="uint8")
@@ -190,18 +199,16 @@ class Webcamera(Webcam):
             b, g, r = cv2.split(output)
             g[g>0] = 255
 
-
             output = cv2.merge((g,b,r))
 
-            for row in range(len(output)):
+            for row in range(130, len(output)):
                 for col in range(len(output[row])):
                     tup = (output[row][col])
                     if any(v != 0 for v in tup):
                         image_bgr[row][col] = tup
 
 
-
-
+            image_bgr = self.__image_rotate(image_bgr, -2)
             return image_bgr, output
         except Exception as ex:
             print(ex)
@@ -224,7 +231,7 @@ class Webcamera(Webcam):
             sleep(interval) #defaults to one second
 
             _image_dynamic = self.save_image(persist=False)
-            _image_dynamic= cv2.cvtColor(numpy.array(_image_dynamic), cv2.COLOR_RGB2GRAY)
+            _image_dynamic = cv2.cvtColor(numpy.array(_image_dynamic), cv2.COLOR_RGB2GRAY)
             _image_dynamic1 = cv2.GaussianBlur(_image_dynamic, (21, 21), 0)
 
             # ideas from http://docs.opencv.org/master/d4/d73/tutorial_py_contours_begin.html#gsc.tab=0
@@ -262,6 +269,66 @@ class Webcamera(Webcam):
             print(ex)
 
 
+    def detect_motion_new(self, winName, interval=1):
+        #Implemented after talking with Dr Smart about image averaging and background extraction
+
+        min_contour_area = 25
+        max_contour_area = 1250
+        retval = False
+        threshold = 65
+        try:
+            _image_static = None
+            _image_static = self.save_image(persist=False)
+            _image_static = cv2.cvtColor(numpy.array(_image_static), cv2.COLOR_RGB2GRAY)
+            _image_static = cv2.GaussianBlur(_image_static, (21, 21), 0)
+
+            accumulator = numpy.float32(_image_static)
+            while True:
+                sleep(interval)
+                _image_static = self.save_image(persist=False)
+                _image_static = cv2.cvtColor(numpy.array(_image_static), cv2.COLOR_RGB2GRAY)
+                _image_static = cv2.GaussianBlur(_image_static, (21, 21), 0)
+
+                cv2.accumulateWeighted(numpy.float32(_image_static), accumulator, 0.1)
+
+                _image_static = cv2.convertScaleAbs(accumulator)
+
+                _image_dynamic = self.save_image(persist=False)
+                _image_dynamic1 = cv2.cvtColor(numpy.array(_image_dynamic), cv2.COLOR_RGB2GRAY)
+                _image_dynamic1 = cv2.GaussianBlur(_image_dynamic1, (21, 21), 0)
+
+                # ideas from http://docs.opencv.org/master/d4/d73/tutorial_py_contours_begin.html#gsc.tab=0
+                _delta = cv2.absdiff(_image_dynamic1, _image_static)
+
+                _threshold = cv2.threshold(_delta, 17, 255, cv2.THRESH_BINARY)[1]
+                # dilate the thresholded image to fill in holes, then find contour on thresholded image
+                _threshold = cv2.dilate(_threshold, None, iterations=5)
+
+                (img, contours, _) = cv2.findContours(_threshold.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+                dyn = cv2.cvtColor(numpy.array(_image_dynamic), cv2.COLOR_RGB2GRAY)
+                # loop over the contours
+                for contour in contours:
+                    # if the contour is too small, ignore it
+                    _area = cv2.contourArea(contour)
+                    if _area < min_contour_area: # or _area > max_contour_area:
+                        continue  # skip to the next
+
+                    # compute the bounding box for the contour, draw it on the frame,
+
+                    (x, y, w, h) = cv2.boundingRect(contour)
+                    #cv2.rectangle(dyn, (x, y), (x + w, y + h), (0, 12, 255), 2)
+                    cv2.ellipse(dyn, (x+5, y+25), (10, 20), 90, 0, 360, (255, 0, 0), 2)
+
+                cv2.imshow(winName, numpy.hstack([dyn, _threshold]))
+
+                key = cv2.waitKey(10)
+                if key == 27:
+                    cv2.destroyWindow(winName)
+                    break
+
+        except Exception as ex:
+            print(ex)
 
     #TODO detect Event
     def detect_event(self):
